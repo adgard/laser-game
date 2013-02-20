@@ -1,7 +1,6 @@
 package 
 {
-	import Box2D.Common.Math.b2Vec2;
-	import Box2D.Dynamics.b2World;
+	
 	import flash.display.MovieClip;
 	import ru.antkarlov.anthill.*;
 	import flash.filters.DropShadowFilter;
@@ -21,7 +20,7 @@ package
 		public var mcIconArrayName:Array = [];
 		
 	    
-		private var m_world:b2World;
+	
 		private var i:int = 0 ;
 		protected var _started:Boolean = false;
 		

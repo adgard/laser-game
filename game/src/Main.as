@@ -2,11 +2,10 @@
 
 {
 	import adobe.utils.CustomActions;
-	import Box2D.Dynamics.Contacts.b2Contact;
-	import Box2D.Dynamics.Contacts.b2ContactEdge;
+	
 	import flash.filters.BlurFilter;
 	import flash.geom.Matrix;
-	import org.as3lib.kitchensync.action.tweentarget.TargetProperty;
+
 	
 	
 	

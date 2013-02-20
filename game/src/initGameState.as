@@ -1,7 +1,5 @@
 package 
 {
-	import Box2D.Common.Math.b2Vec2;
-	import Box2D.Dynamics.b2World;
 	import flash.display.MovieClip;
 	import nape.callbacks.CbType;
 	import ru.antkarlov.anthill.*;
@@ -18,7 +16,7 @@ package
 		public var storage:AntStorage = new AntStorage(true);
 		public var sharedObj:AntCookie = new AntCookie();
 	    private var levelNumber:int = 0; 
-		private var m_world:b2World;
+
 		private var mcArrayFromLevel:Array = [];
 		
 		protected var _started:Boolean = false;
