@@ -113,6 +113,8 @@ package
 			 var movesensorCbType:CbType = new CbType();
 			 var moveableCbType:CbType = new CbType();
 			 var iceCbType:CbType = new CbType();
+			 
+			 var hero4CbType:CbType = new CbType();
 			 var hero3CbType:CbType = new CbType();
 			 var hero2CbType:CbType = new CbType();
 			 var hero1CbType:CbType = new CbType();
@@ -127,6 +129,7 @@ package
 			AntG.storage.set("moveableCBT", moveableCbType);
 			AntG.storage.set("movesensorCBT", movesensorCbType);
 			AntG.storage.set("iceCBT", iceCbType);
+			AntG.storage.set("hero4CBT", hero4CbType);
 			AntG.storage.set("hero3CBT", hero3CbType);
 			AntG.storage.set("hero2CBT", hero2CbType);
 			AntG.storage.set("hero1CBT", hero1CbType);

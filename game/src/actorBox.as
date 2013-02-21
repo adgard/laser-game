@@ -3,6 +3,7 @@ package
 	import flash.display.InteractiveObject;
 	import flash.geom.Point;
 	import nape.callbacks.*;
+	import nape.shape.Circle;
 	
 	import nape.geom.Vec2;
 	import nape.phys.Body;
@@ -20,14 +21,21 @@ package
 	 */
 	public class actorBox extends actor
 	{
+		
 		public var xy:Vec2 = new Vec2(0, 0);
 	    public var rotation:Number = 0;
 		public var bType:String  = "";
 		public var type:String  = "";
 		public var isJumping:Boolean  = false;
+		public var canJump:Boolean  = false;
+		public var jumpRayEnabled:Boolean  = false;
+		public var rayFailedCounter:int  = 0;
+		
+		
+		
 		public var rayEnabled:Boolean  = false;
 		public var rayArray:Array  = [];
-		
+		public var circle:Circle;
 		
 		
 		public var settings:Array  = [];
@@ -114,6 +122,13 @@ package
 		    polygon = new Polygon(Polygon.box(4, 12)) ;
 	       break;
 		  
+		   case "herobox":
+		    polygon = new Polygon(Polygon.box((img.width - 2) * scaleX, (img.height - 2) * scaleY)) ;
+			polygon.sensorEnabled  = false;
+			circle = new Circle(img.width / 2 - 2);
+			circle.sensorEnabled =  true;
+	       break;
+		   
 		   
 		   case "points":
 		    polygon = new Polygon(pointsArray);
@@ -168,6 +183,10 @@ package
 	     default:
 		 break;
 		}
+		if (shType == "herobox")
+		{
+			circle.material = polygon.material;
+		}
 		switch (gameType) {
 		
 		 case "button":
@@ -182,6 +201,12 @@ package
 		 case "hero2":
 		 	body.cbTypes.add(AntG.storage.get("dynamicCBT"));
 			body.cbTypes.add(AntG.storage.get("hero2CBT"));		
+		 break;
+		 
+		  case "hero4":
+		 	body.cbTypes.add(AntG.storage.get("dynamicCBT"));
+			body.cbTypes.add(AntG.storage.get("hero4CBT"));	
+			circle.sensorEnabled = true;
 		 break;
 		 
 		 case "balloon":
@@ -236,6 +261,9 @@ package
 		}
 		body.rotation = rotation;	
 		body.shapes.add(polygon);
+		if (shType == "herobox") 
+		 body.shapes.add(circle);
+		
 		
 		body.position.setxy(xy.x, xy.y);
 		body.userData.graphic = img;

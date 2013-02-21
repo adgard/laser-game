@@ -158,11 +158,17 @@ package
 				         mcForPhysics.push(obj);
 					break;
 					
+				
+					
 					
 					case "circle":
 						if(mcForPhysics.indexOf(getQualifiedClassName(MovieClip(obj)))==-1)
 				         mcForPhysics.push(obj);
 					break;
+					
+					
+					
+					
 					
 				    case "joint":
 					 mcForJoints.push(obj);
@@ -227,6 +233,9 @@ package
 					  break;
 					  
 				
+					
+					  
+					  
 					  
 				      default:
 					   trace('nothing for physics');
@@ -458,16 +467,19 @@ package
 					 break;
 				     
 				    case "hero2":
-					    if(!Body(bL.at(0)).userData.act.isJumping){
-						 jumpHero(Body(bL.at(0)));
-						 Body(bL.at(0)).userData.act.isJumping = true;
+					    if(!Body(bL.at(0)).userData.act.jumpRayEnabled){
+						 addJumpRays(Body(bL.at(0)));
+						 
 						}
-					   
+						if(Body(bL.at(0)).userData.act.canJump)
+					     heroJump(bL.at(0));
+						else 
+						 trace("in flying");
 					 	 //createBalloon(new Vec2(AntG.mouse.x,AntG.mouse.y),bL.at(0));
-						 if (Body(bL.at(0)).userData.act.contactCounterIce > 0) {
+					/*	 if (Body(bL.at(0)).userData.act.contactCounterIce > 0) {
 							     
 							     removeIceUnderHero2(Body(bL.at(0)).userData.act.iceUnderHero);   
-							   }
+							   }*/
 					 break;
 					 
 				     case "hero3":
@@ -476,9 +488,13 @@ package
 						// gameCompleted();
 					 break;
 				    
+				 case "hero4":
+					   recreateHero(bL.at(0)); 
+				 break; 
+					 
 				  case "attraction":
 					  if(bL.at(0).userData.act.rayEnabled == false){
-					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), bL.at(0).rotation,"attraction");
+					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"attraction",200);
 				       rayCastArray.push(currentRay);
 					   bL.at(0).userData.act.rayEnabled = true;
 					   bL.at(0).userData.act.rayArray.push(currentRay);
@@ -498,7 +514,7 @@ package
 				 
 				 case "emitter":
 					  if(bL.at(0).userData.act.rayEnabled == false){
-					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), bL.at(0).rotation,"emitter");
+					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"emitter",200);
 				       rayCastArray.push(currentRay);
 					   bL.at(0).userData.act.rayEnabled = true;
 					   bL.at(0).userData.act.rayArray.push(currentRay);
@@ -518,7 +534,7 @@ package
 				 
 				  case "killer":
 					  if(bL.at(0).userData.act.rayEnabled == false){
-					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), bL.at(0).rotation,"killer");
+					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"killer",200);
 				       rayCastArray.push(currentRay);
 					   bL.at(0).userData.act.rayEnabled = true;
 					   bL.at(0).userData.act.rayArray.push(currentRay);
@@ -537,7 +553,7 @@ package
 				 break;
 				  case "repulsion":
 					  if(bL.at(0).userData.act.rayEnabled == false){
-					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), bL.at(0).rotation,"repulsion");
+					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"repulsion",200);
 				       rayCastArray.push(currentRay);
 					   bL.at(0).userData.act.rayEnabled = true;
 					   bL.at(0).userData.act.rayArray.push(currentRay);
@@ -557,11 +573,11 @@ package
 				 
 				 
 				  case "fan":
-					currentRay =  new rays(bL.at(0), new Vec2( -10, -10), bL.at(0).rotation, "fan");
+					currentRay =  new rays(bL.at(0), new Vec2( -10, -10), 0, "fan",200);
 					rayCastArray.push(currentRay);
-					currentRay =  new rays(bL.at(0), new Vec2( -10, 0), bL.at(0).rotation, "fan");
+					currentRay =  new rays(bL.at(0), new Vec2( -10, 0), 0, "fan",200);
 					rayCastArray.push(currentRay);
-					currentRay =  new rays(bL.at(0), new Vec2( -10, 10), bL.at(0).rotation, "fan");
+					currentRay =  new rays(bL.at(0), new Vec2( -10, 10), 0, "fan",200);
 					rayCastArray.push(currentRay);
 					
 					
@@ -578,6 +594,29 @@ package
 				 }
 			}
 		}
+		
+		private function heroJump(b:Body):void 
+		{
+			var imp:Vec2 = new Vec2(0, -200);
+			b.applyImpulse(imp, b.position);
+			b.userData.act.canJump = false;
+			
+		}
+		
+		private function recreateHero(b:Body):void 
+		{
+			if(b.userData.act.polygon.sensorEnabled == true){
+			 b.userData.act.polygon.sensorEnabled = false;
+			 b.userData.act.circle.sensorEnabled = true;
+			 AntActor(b.userData.graphic).gotoAndStop(1);
+			}
+			else {
+			       b.userData.act.polygon.sensorEnabled = true;
+			       b.userData.act.circle.sensorEnabled = false;
+			       AntActor(b.userData.graphic).gotoAndStop(2);	
+				 }
+			
+		}
 	private function updateRayCast():void
 	{
 		
@@ -586,10 +625,22 @@ package
 			
 	} //end
 		
-		private function jumpHero(b:Body):void 
+		private function addJumpRays(b:Body):void 
 		{
-			var imp:Vec2 = new Vec2(0, -200);
-			b.applyImpulse(imp,b.position);
+			var r1:rays;
+			var r2:rays;
+			var r3:rays;
+			r1 = new rays(b, new Vec2(0,0), Math.PI,"heroRay",19);
+			r2 = new rays(b, new Vec2(0,0), -3*Math.PI / 4, "heroRay",23);
+			r3 = new rays(b, new Vec2(0,0), 3*Math.PI / 4, "heroRay",23);
+			rayCastArray.push(r1);
+			
+			rayCastArray.push(r2);
+			rayCastArray.push(r3);
+			r1.update();
+			r2.update();
+			r3.update();
+			b.userData.act.rayFailedCounter = 0;
 		}
 		
 		private function levelCompleted():void 

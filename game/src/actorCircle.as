@@ -28,6 +28,7 @@ package
 		public var shType:String;
 		public var mType:String;
 		public var circle:Circle;
+		public var polygon:Polygon;
 		public var scaleX:int =1;
 		public var scaleY:int = 1;
 		public var isSensor:Boolean = false;
@@ -41,6 +42,8 @@ package
 		public var contactCounterIce:int = 0;
 		public var iceUnderHero:Array = [];
 		public var gameType:String = "none";
+		
+		public var canJump:Boolean  = false;
 		
 		
 		public function actorCircle( img:AntActor,_xy:Vec2, _rotation:Number, _bType:String,_shType:String, _settings:Array, _mType:String,_type:String,_isSensor:Boolean,_velxy:Vec2,_isMoveable:Boolean,_isMoveSensor:Boolean,_refNumber:int, _refType:String,_gameType:String) 
@@ -98,6 +101,13 @@ package
 		    circle = new Circle(11);
 	       break;
 		   
+		   case "herocircle":
+		    polygon = new Polygon(Polygon.box((img.width - 2) * scaleX, (img.height - 2) * scaleY)) ;
+			circle = new Circle(img.width / 2 - 2);
+			polygon.sensorEnabled  = true;
+			circle.sensorEnabled =  false;
+			img.gotoAndStop(2);
+	       break;
 		   
 	       default:
 		     circle = new Circle(img.width/2);
@@ -144,6 +154,11 @@ package
 	     default:
 		 break;
 		}
+		
+		if (shType == "herocircle")
+		{
+			polygon.material = circle.material;
+		}
 			switch (gameType) {
 			 case "button":
 				body.cbTypes.add(AntG.storage.get("buttonCBT"));	
@@ -165,6 +180,11 @@ package
 			    body.cbTypes.add(AntG.storage.get("collectCBT"));	
 		     break;
 			 
+		     case "hero4":
+		 	  body.cbTypes.add(AntG.storage.get("dynamicCBT"));
+			  body.cbTypes.add(AntG.storage.get("hero4CBT"));		
+		     break;
+			 
 		     default:
 			  if(bType == "dynamic"){
 			   body.cbTypes.add(AntG.storage.get("dynamicCBT"));
@@ -173,6 +193,9 @@ package
 			}
 		body.rotation = rotation;	
 		body.shapes.add(circle);
+		if (shType == "herocircle") 
+		 body.shapes.add(polygon);
+		 
 		body.allowRotation = true;
 		
 		body.position.setxy(xy.x, xy.y);

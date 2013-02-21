@@ -22,6 +22,8 @@ package
 		public var rayMC:MovieClip =  new MovieClip();
 		private var rayAnimation:AntAnimation;
 		private var rayAngle:Number = 0;
+		private var rayAngleInitial:Number = 0;
+		
 		private var rayPoints:Array =  [];
 		private var ray:Ray;
 		private var rayCurrentPoint:Vec2;
@@ -31,12 +33,15 @@ package
 		private var rayBody:Body;
 		private var type:String = "none";
 		private var colorRay:uint = 0x000000;
+		private var distance:Number = 0;
 		
 		
 		
-		public function rays(_body:Body,_point:Vec2,_angle:Number,_type:String) 
+		
+		
+		public function rays(_body:Body,_point:Vec2,_angle:Number,_type:String,_distance:Number) 
 		{
-		
+		     distance = _distance;
 			 type = _type;
 			 rayActor = new AntActor();
 			 rayActor.tag = 500;
@@ -57,6 +62,9 @@ package
 				  colorRay = 0xFD807F;
 				 break;
 				 
+				 case "heroRay":
+				  colorRay = 0x000000;
+				 break;
 				 
 				 default:
 				 break;
@@ -68,8 +76,10 @@ package
 			 rayCurrentPoint = _body.position;
 			 
 			 
-			 rayAngle = _angle; 
+			
+			 rayAngleInitial = _angle;
 			 rayBody = _body;
+			 rayAngle = rayBody.rotation;
 			 _rayOffSet = _point;
 			 rayOffSet = _rayOffSet.rotate(rayBody.rotation-Math.PI/2);
 			 
@@ -82,9 +92,14 @@ package
  			var ang:Number = 0;
 			
 			//trace("x= " + rayOffSet.x + " y= " + rayOffSet.y);
-			prevVec2 = Vec2.fromPolar(1, rayBody.rotation-Math.PI/2);
+			if (type == "heroRay") 
+			 prevVec2 = Vec2.fromPolar(1,3 * Math.PI / 2 + rayAngleInitial);
+			else 
+			 prevVec2 = Vec2.fromPolar(1, rayBody.rotation - Math.PI / 2 + rayAngleInitial);
+			 trace("prevec= " + String(rayBody.rotation - Math.PI / 2 + rayAngleInitial));
+			
 			ray = new Ray(new Vec2(rayBody.position.x-rayOffSet.x,rayBody.position.y-rayOffSet.y), prevVec2);// Vec2.fromPolar(1,bL.at(0).rotation));
-					 ray.maxDistance = 200;
+					 ray.maxDistance = distance;
 					
 					 rayResult = AntG.space.rayCast(ray, false);
 					if(rayResult!= null)
@@ -98,9 +113,26 @@ package
 					 rayMC.graphics.lineStyle(4, colorRay, 2, false, "normal", "none", "bevel", 0.1);
 					 rayMC.graphics.moveTo(rayBody.position.x-rayOffSet.x,rayBody.position.y-rayOffSet.y);
 					 rayMC.graphics.lineTo(resultPt.x, resultPt.y);
+					   //////////////////////// 
+					  if (type == "heroRay") {
+						   if (rayResult != null) {
+							 rayBody.userData.act.canJump = true;
+							 return;
+						   }
+						   else {
+							     rayBody.userData.act.rayFailedCounter++; 
+								  if (rayBody.userData.act.rayFailedCounter >= 3) {
+									   rayBody.userData.act.canJump = false;
+									   
+									  }
+									return;  
+							    }
+						    
+					  }	  
+						////////////////////
 					  if (rayResult == null)
 						  return;
-						  
+						
 						 switch(rayResult.shape.body.userData.act.mType) {
 							 case "wood":
 					          applyImpulses(type, rayResult.shape.body, prevVec2, resultPt);

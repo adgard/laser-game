@@ -80,6 +80,9 @@ public class actor extends EventDispatcher
 			  }
 		 } 
 	}
+	if (actorBox(_body.userData.act).gameType == "hero4") {
+		_body.userData.act.rayFailedCounter = 0;
+		}
 	return;
    }
    if (_body.userData.act is actorCircle){ 

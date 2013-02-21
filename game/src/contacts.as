@@ -94,7 +94,33 @@ package
 		
 		private function beginCollisionHandlerHero2Ice(cb:InteractionCallback):void 
 		{
-			trace("begin ice hero");
+			
+			  var n:int;
+			
+			if (cb.int1.userData.act.gameType == "hero2") { 
+			   cb.int1.userData.act.contactCounterIce--;
+			   n = cb.int1.userData.act.iceUnderHero.indexOf(cb.int2.userData.act);
+			  if ((n != -1)&&(Body(cb.int1).velocity.y < -40)){
+                AntG.storage.get("actorForDelete").push(cb.int2.userData.act);
+		       cb.int1.userData.act.iceUnderHero.splice(n, 1); 
+			   
+			  }
+			 }
+		 else {
+			   cb.int2.userData.act.contactCounterIce--;
+			    n = cb.int2.userData.act.iceUnderHero.indexOf(cb.int1.userData.act);
+			  if ((n != -1)&&(Body(cb.int2).velocity.y <-40)) {
+			   AntG.storage.get("actorForDelete").push(cb.int1.userData.act);
+		       cb.int2.userData.act.iceUnderHero.splice(n, 1); 
+			  }
+			  }	
+			  
+		}
+		
+		private function endCollisionHandlerHero2Ice(cb:InteractionCallback):void 
+		{
+			trace("end ice hero");
+			
 			if (cb.int1.userData.act.gameType == "hero2") { 
 			   cb.int1.userData.act.contactCounterIce++;
 			   cb.int1.userData.act.iceUnderHero.push(cb.int2.userData.act); 
@@ -103,25 +129,9 @@ package
 			   cb.int2.userData.act.contactCounterIce++;
 			   cb.int2.userData.act.iceUnderHero.push(cb.int1.userData.act);
 			  }	 
-		}
-		
-		private function endCollisionHandlerHero2Ice(cb:InteractionCallback):void 
-		{
-			trace("end ice hero");
-			var n:int;
 			
-			if (cb.int1.userData.act.gameType == "hero2") { 
-			   cb.int1.userData.act.contactCounterIce--;
-			   n = cb.int1.userData.act.iceUnderHero.indexOf(cb.int2.userData.act);
-			  if(n!=-1)
-		       cb.int1.userData.act.iceUnderHero.splice(n, 1); 
-			 }
-		 else {
-			   cb.int2.userData.act.contactCounterIce--;
-			    n = cb.int2.userData.act.iceUnderHero.indexOf(cb.int1.userData.act);
-			  if(n!=-1)
-		       cb.int2.userData.act.iceUnderHero.splice(n, 1); 
-			  }	 
+			
+			 
 		}
 		
 		////////////////
