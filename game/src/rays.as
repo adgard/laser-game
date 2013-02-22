@@ -139,7 +139,7 @@ package
 						
 						 switch(rayResult.shape.body.userData.act.mType) {
 							 case "wood":
-					          applyImpulses(type, rayResult.shape.body, prevVec2, resultPt);
+					          applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
 							  return;
 							 break;
 							 default:
@@ -196,14 +196,17 @@ package
 		
 		private function applyImpulses(_type:String,_body:Body,_pointImpulse:Vec2,_impulse:Vec2):void 
 		{
-			             switch(_type) {
+			var m:Number = 0 ;
+            m = _body.mass;
+			trace(m);
+			               switch(_type) {
                                case "repulsion":
-								   _body.applyImpulse(_impulse.mul(0.01),_pointImpulse);
+								   _body.applyImpulse(_impulse.mul(m * 8),_pointImpulse);
 								   
 							   break;	
 							   
 							   case "attraction":
-								   _body.applyImpulse(_impulse.mul(0.01).rotate(Math.PI),_pointImpulse);  
+								   _body.applyImpulse(_impulse.mul(m * 8).rotate(Math.PI),_pointImpulse);  
 							   break;	
 							   case "steel":
 							   break;	 

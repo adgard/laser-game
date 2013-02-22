@@ -220,10 +220,14 @@ package
 				 switch (c.name2) {
 					
 					 case "rectangle":
+					 if(c.typeElement != "level"){
 					   currentActor = new actorBox(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement);
 					   _space.bodies.add(currentActor._body);
 					   actorArray.push(currentActor);
-					  break;
+					 }
+					 else 
+					  createLever(c);
+					 break;
 				      
 					   
 					  case "circle":
@@ -231,11 +235,7 @@ package
 					   _space.bodies.add(currentActor._body);
 					   actorArray.push(currentActor);
 					  break;
-					  
-				
-					
-					  
-					  
+
 					  
 				      default:
 					   trace('nothing for physics');
@@ -271,6 +271,50 @@ package
 					 }
 				  //currentActor = new 
 				}	
+		}
+		
+		private function createLever(c:componentClass):void 
+		{
+		
+			var currentDistance:Number=100;
+			var currentBalloonPoint:Number;
+			var aNumber:int = 0;
+			var i:int = 0;
+			
+			 var currentAntActor:AntActor = new AntActor();
+				 
+				 var currentLever:actorBox;
+				
+				 
+				 var currentJoint:PivotJoint;
+				 var comp:Compound = new Compound();
+				 var v2:Vec2;
+			     
+			
+ 
+				  currentAntActor.x = c.x;
+				  currentAntActor.y = c.y;
+				  currentAntActor.angle = 0;
+				  currentAntActor.addAnimationFromCache("node1");      
+				  add(currentAntActor);
+				  currentLever = new actorBox(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement); 
+				  currentLever._body.compound = comp;
+				  
+				  actorArray.push(currentLever);
+
+				  
+				  currentJoint = new PivotJoint(currentLever._body, currentLever._body, b.worldPointToLocal(new Vec2(c.x, c.y)), currentLever._body.worldPointToLocal(new Vec2(c.x, c.y)));
+				  currentJoint.ignore = true;
+				  currentJoint.maxForce = 1000;
+				  currentJoint.compound = comp;
+				  
+				 
+				  
+				  _space.compounds.add(comp);
+				  
+				  
+
+		
 		}
 		
 		private function getPointForComplex(com:MovieClip):Array

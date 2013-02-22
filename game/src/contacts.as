@@ -54,8 +54,9 @@ package
 		
 		private function initCollisionListenersSpikes():void 
 		{
-		   var opt1:OptionType = new OptionType([AntG.storage.get("hero2CBT"),AntG.storage.get("hero1CBT"),AntG.storage.get("balloonCBT")]);
+		   //var opt1:OptionType = new OptionType([AntG.storage.get("hero2CBT"),AntG.storage.get("hero1CBT"),AntG.storage.get("hero3CBT"),AntG.storage.get("hero4CBT"),AntG.storage.get("balloonCBT")]);
 		   var opt2:OptionType = new OptionType(AntG.storage.get("spikeCBT"));
+		   var opt1:OptionType = new OptionType(AntG.storage.get("balloonCBT"));
 		   
 			var beginCollideListener:InteractionListener = new InteractionListener(CbEvent.BEGIN, InteractionType.COLLISION, opt1, opt2, beginCollisionHandlerSpikes);
 			
