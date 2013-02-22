@@ -463,7 +463,10 @@ package
 				   if ((bL.length > 0)) {
 				    switch (actor(Body(bL.at(0)).userData.act)._type) {
 					 case "hero1":
-						 createBalloon(new Vec2(AntG.mouse.x,AntG.mouse.y),bL.at(0));
+						 if(!bL.at(0).userData.act.balloonEnabled){
+						  createBalloon(new Vec2(AntG.mouse.x, AntG.mouse.y), bL.at(0));
+						  Body(bL.at(0)).userData.act.balloonEnabled = true;
+						 }
 					 break;
 				     
 				    case "hero2":
@@ -720,15 +723,32 @@ package
 		
 		private function createBalloon(vec2:Vec2, b:Body):void 
 		{
-			   
-				 var currentAntActor:AntActor = new AntActor();
+			var currentDistance:Number=100;
+			var currentBalloonPoint:Number;
+			var aNumber:int = 0;
+			var i:int = 0;
+			
+			 var currentAntActor:AntActor = new AntActor();
 				 
-				 var currentNode1:actor;
-				 var currentNode2:actor;
-				 var currentBalloon:actor;
+				 var currentNode1:actorBox;
+				 var currentNode2:actorBox;
+				 var currentBalloon:actorCircle;
 				 
 				 var currentJoint:PivotJoint;
 				 var comp:Compound = new Compound();
+				 var v2:Vec2;
+			     
+			for each(var v:Vec2 in b.userData.act.balloonPoints) {
+				 v2 = b.localPointToWorld(v);
+				 if(currentDistance >= Vec2.distance(v2,vec2)){
+				  	currentDistance = Vec2.distance(v2, vec2);
+				    aNumber = i;
+					}
+					i++;
+			}
+			vec2 = b.localPointToWorld(b.userData.act.balloonPoints[aNumber]);
+			
+				
 				 
 				 
 				  currentAntActor.x = vec2.x;
@@ -738,6 +758,7 @@ package
 				  add(currentAntActor);
 				  currentNode1 = new actorBox(currentAntActor, new Vec2(vec2.x,vec2.y-5), 0, "dynamic", "balloon", [0,0,0,0,0],"wood",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","balloon");
 				  currentNode1._body.compound = comp;
+				  currentNode1.heroConnected = b.userData.act;
 				  actorArray.push(currentNode1);
 
 				  currentAntActor = new AntActor();
@@ -748,6 +769,7 @@ package
 				  add(currentAntActor);
 				  currentNode2 = new actorBox(currentAntActor, new Vec2(vec2.x,vec2.y-5), 0, "dynamic", "balloon", [0,0,0,0,0],"wood",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","balloon");
 				  currentNode2._body.compound = comp;
+				  currentNode2.heroConnected = b.userData.act;
 				  actorArray.push(currentNode2);
 				  
 				  currentAntActor = new AntActor();
@@ -761,7 +783,7 @@ package
 				  currentAntActor.gotoAndPlay(1);
 				  currentBalloon  = new actorCircle(currentAntActor, new Vec2(vec2.x,vec2.y-21), 0, "dynamic", "balloon", [0,0,0,0,0],"wood","circle",false,new Vec2(0,0),false,false,0,"none","balloon");
 				  currentBalloon._body.gravMass = -currentBalloon._body.gravMass; 
-		
+		          currentBalloon.heroConnected = b.userData.act;
 				  currentBalloon._body.compound = comp;
 				  actorArray.push(currentBalloon);
 				  
@@ -938,6 +960,9 @@ package
 				   }
 			       		
 			//		itemToDelete.removeActor();
+			        if (itemToDelete._body.userData.act.shType == "balloon")
+					  Body(itemToDelete._body).userData.act.heroConnected.balloonEnabled = false;
+					  
 			        _space.compounds.remove(itemToDelete._body.compound);
 				  } 
 			  n = actorForDelete.indexOf(itemToDelete);

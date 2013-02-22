@@ -29,6 +29,7 @@ package
 		private var rayCurrentPoint:Vec2;
 		private var rayOffSet:Vec2;
 		private var _rayOffSet:Vec2;
+		private var p:Vec2;
 		
 		private var rayBody:Body;
 		private var type:String = "none";
@@ -80,8 +81,9 @@ package
 			 rayAngleInitial = _angle;
 			 rayBody = _body;
 			 rayAngle = rayBody.rotation;
-			 _rayOffSet = _point;
-			 rayOffSet = _rayOffSet.rotate(rayBody.rotation-Math.PI/2);
+			 _rayOffSet = new Vec2(0, 0);//_point;
+			 p = _point//.rotate(Math.PI/2);
+			// rayOffSet = _rayOffSet.rotate(rayBody.rotation-Math.PI/2);
 			 
 		}
 		public function update():void
@@ -90,13 +92,15 @@ package
 			var rayResult:RayResult;
 			var prevVec2:Vec2;
  			var ang:Number = 0;
-			
+ 			
+			//_rayOffSet = p;
+			rayOffSet = _rayOffSet.rotate(rayBody.rotation);
 			//trace("x= " + rayOffSet.x + " y= " + rayOffSet.y);
 			if (type == "heroRay") 
 			 prevVec2 = Vec2.fromPolar(1,3 * Math.PI / 2 + rayAngleInitial);
 			else 
 			 prevVec2 = Vec2.fromPolar(1, rayBody.rotation - Math.PI / 2 + rayAngleInitial);
-			 trace("prevec= " + String(rayBody.rotation - Math.PI / 2 + rayAngleInitial));
+			 //trace("prevec= " + String(rayBody.rotation - Math.PI / 2 + rayAngleInitial));
 			
 			ray = new Ray(new Vec2(rayBody.position.x-rayOffSet.x,rayBody.position.y-rayOffSet.y), prevVec2);// Vec2.fromPolar(1,bL.at(0).rotation));
 					 ray.maxDistance = distance;
@@ -154,7 +158,8 @@ package
 						 prevVec2.x  = rayResult.normal.x;
 						 prevVec2.y  = rayResult.normal.y;
 						 
-						 prevVec2 = new Vec2(rayResult.normal.x,rayResult.normal.y);
+						 prevVec2 = new Vec2(rayResult.normal.x, rayResult.normal.y);
+						 prevVec2.rotate(rayAngle);
 						  ray = new Ray(rayCurrentPoint, prevVec2);
 					     
 						  
@@ -173,7 +178,7 @@ package
 						  return;
 						  
 							 switch(rayResult.shape.body.userData.act.mType) {
-							 case "wood":
+							 case "steel":
 					          applyImpulses(type, rayResult.shape.body, prevVec2, resultPt);
 							  return;
 							 break;
@@ -198,7 +203,7 @@ package
 							   break;	
 							   
 							   case "attraction":
-								   _body.applyImpulse(_impulse.mul(0.01),_pointImpulse);  
+								   _body.applyImpulse(_impulse.mul(0.01).rotate(Math.PI),_pointImpulse);  
 							   break;	
 							   case "steel":
 							   break;	 

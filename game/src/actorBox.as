@@ -22,6 +22,7 @@ package
 	public class actorBox extends actor
 	{
 		
+		public var balloonEnabled:Boolean =  false;
 		public var xy:Vec2 = new Vec2(0, 0);
 	    public var rotation:Number = 0;
 		public var bType:String  = "";
@@ -37,7 +38,7 @@ package
 		public var rayArray:Array  = [];
 		public var circle:Circle;
 		
-		
+		public var heroConnected:actor = null;
 		public var settings:Array  = [];
 		public var body:Body;
 		public var shType:String;
@@ -60,6 +61,11 @@ package
 		public var contactCounterIce:int = 0;
 		public var iceUnderHero:Array = [];
 		public var gameType:String = "none";
+		
+		
+		public var balloonPoints:Array = [new Vec2( -15,-15),new Vec2( -15,15),new Vec2( 15,-15),new Vec2( 15,15)];
+		
+		
 		
 		
 		

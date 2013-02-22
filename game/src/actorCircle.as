@@ -17,6 +17,7 @@ package
 	 */
 	public class actorCircle extends actor
 	{
+		public var balloonEnabled:Boolean =  false;
 		public var rayEnabled:Boolean  = false;
 		public var rayArray:Array  = [];
 		public var xy:Vec2 = new Vec2(0, 0);
@@ -44,6 +45,7 @@ package
 		public var gameType:String = "none";
 		
 		public var canJump:Boolean  = false;
+		public var heroConnected:actor = null;
 		
 		
 		public function actorCircle( img:AntActor,_xy:Vec2, _rotation:Number, _bType:String,_shType:String, _settings:Array, _mType:String,_type:String,_isSensor:Boolean,_velxy:Vec2,_isMoveable:Boolean,_isMoveSensor:Boolean,_refNumber:int, _refType:String,_gameType:String) 
@@ -95,6 +97,7 @@ package
 	       break;
 		   case "balloon":
 		    circle = new Circle(21);
+			
 	       break;
 		   
 		   case "star":

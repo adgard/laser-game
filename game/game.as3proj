@@ -17,7 +17,6 @@
   <classpaths>
     <class path="src" />
     <class path="..\flashUtil" />
-    <class path="..\KitchenSync" />
   </classpaths>
   <!-- Build options -->
   <build>
