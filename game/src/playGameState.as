@@ -7,6 +7,7 @@ package
 	import nape.callbacks.*;
 	import nape.callbacks.InteractionCallback;
 	import nape.callbacks.InteractionListener;
+	import nape.constraint.AngleJoint;
 	import nape.constraint.MotorJoint;
 	import nape.constraint.PivotJoint;
 	import nape.constraint.WeldJoint;
@@ -220,7 +221,7 @@ package
 				 switch (c.name2) {
 					
 					 case "rectangle":
-					 if(c.typeElement != "level"){
+					 if(c.typeElement != "lever"){
 					   currentActor = new actorBox(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement);
 					   _space.bodies.add(currentActor._body);
 					   actorArray.push(currentActor);
@@ -276,41 +277,50 @@ package
 		private function createLever(c:componentClass):void 
 		{
 		
-			var currentDistance:Number=100;
-			var currentBalloonPoint:Number;
-			var aNumber:int = 0;
-			var i:int = 0;
+		
 			
 			 var currentAntActor:AntActor = new AntActor();
 				 
 				 var currentLever:actorBox;
 				
 				 
-				 var currentJoint:PivotJoint;
-				 var comp:Compound = new Compound();
-				 var v2:Vec2;
-			     
-			
+				 var pJoint:PivotJoint;
+				  var aJoint:AngleJoint;
+				
+				 var b2:Body;
+			     var b2List:BodyList = _space.bodiesUnderPoint(new Vec2(c.x, c.y));
+			     if (b2List.length > 0 ){
+				  b2 =  b2List.at(0);
  
 				  currentAntActor.x = c.x;
 				  currentAntActor.y = c.y;
 				  currentAntActor.angle = 0;
-				  currentAntActor.addAnimationFromCache("node1");      
+				  currentAntActor.addAnimationFromCache("leverImg");      
 				  add(currentAntActor);
-				  currentLever = new actorBox(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement); 
-				  currentLever._body.compound = comp;
+				   currentAntActor.tag = defGroup.numChildren;
+				  currentLever = new actorBox(currentAntActor, new Vec2(c.x, c.y-12), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement); 
+				  _space.bodies.add(currentLever._body);
 				  
 				  actorArray.push(currentLever);
 
 				  
-				  currentJoint = new PivotJoint(currentLever._body, currentLever._body, b.worldPointToLocal(new Vec2(c.x, c.y)), currentLever._body.worldPointToLocal(new Vec2(c.x, c.y)));
-				  currentJoint.ignore = true;
-				  currentJoint.maxForce = 1000;
-				  currentJoint.compound = comp;
+				  pJoint = new PivotJoint(currentLever._body, b2, currentLever._body.worldPointToLocal(new Vec2(c.x, c.y)), b2.worldPointToLocal(new Vec2(c.x, c.y)));
+				  pJoint.ignore = true;
+				//  pJoint.maxForce = 1000;
+				 _space.constraints.add(pJoint);
+				 
+				   aJoint = new AngleJoint( b2,currentLever._body,-Math.PI/4,Math.PI/4,1);
+				  aJoint.ignore = true;
+				//  aJoint.maxForce = 1000;
+				 _space.constraints.add(aJoint);
+				 
+				 trace("lever"); 
+				 }
+				//  currentJoint.compound = comp;
 				  
 				 
 				  
-				  _space.compounds.add(comp);
+				//  _space.compounds.add(comp);
 				  
 				  
 

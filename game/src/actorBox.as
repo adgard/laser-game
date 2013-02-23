@@ -186,7 +186,8 @@ package
 		  polygon.material.staticFriction = settings[4];
 		 break;
 		 
-	     default:
+	 default:
+		 polygon.material = Material.steel();
 		 break;
 		}
 		if (shType == "herobox")
@@ -258,6 +259,9 @@ package
 			 polygon.filter.collisionGroup = 0x000000001;
 			 
 		break;	
+		 
+		
+		
 		 default:
 			if(bType == "dynamic"){
 			 body.cbTypes.add(AntG.storage.get("dynamicCBT"));

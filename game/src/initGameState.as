@@ -46,10 +46,13 @@ package
 			
 			//Добавляем классы клипов которые необходимо растеризировать.
 			startCashing();
+			
+			
 			AntG.cache.addClips(mcForRasterization); 
 			AntG.cache.addClips([clockOrange]);
 			AntG.cache.addClip(jointForMouse); 
-			AntG.cache.addClips([node1,node2,balloon1]); 
+			AntG.cache.addClips([node1, node2, balloon1]); 
+			AntG.cache.addClip(leverImg); 
 			// Добавляем обработчик для завершения процесса растеризации.
 			AntG.cache.eventComplete.add(onCacheComplete);
 			
