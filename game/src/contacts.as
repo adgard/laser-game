@@ -28,7 +28,7 @@ package
 		
 		public function initCollisionListenersCollectble():void 
 		{
-			var opt1:OptionType = new OptionType([AntG.storage.get("hero2CBT"),AntG.storage.get("hero1CBT")]);
+			var opt1:OptionType = new OptionType([AntG.storage.get("hero2CBT"),AntG.storage.get("hero1CBT"),AntG.storage.get("hero4CBT")]);
 		    var opt2:OptionType = new OptionType(AntG.storage.get("collectCBT"));
 		   
 			var beginCollideListener:InteractionListener = new InteractionListener(CbEvent.BEGIN, InteractionType.SENSOR, opt1, opt2, beginCollisionHandlerCollect);

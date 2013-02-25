@@ -10,7 +10,7 @@ package
 	public class initGameState extends AntState
 	{
 		private var _camera:AntCamera;
-			private var mcForRasterization:Array = []; 
+			private var mcForRasterization:Vector.<Class> = new Vector.<Class>; 
 		private var mmenu:AntActor;
 		private var btn:AntButton;
 		public var storage:AntStorage = new AntStorage(true);
@@ -18,13 +18,18 @@ package
 	    private var levelNumber:int = 0; 
 
 		private var mcArrayFromLevel:Array = [];
-		
+		private var loader:AntAssetLoader = new AntAssetLoader();
+			
 		protected var _started:Boolean = false;
-		
 		
 		public function initGameState()
 		{
 			super();
+		}
+		
+		override public function create():void
+		{
+			
 			
 			_started = false;
 			
@@ -35,11 +40,11 @@ package
 			 sharedObj.open("mutation");
 			 loadDataToStorage();
 			 
-			_camera = new AntCamera(640, 480);
+			_camera = new AntCamera(0,0,640, 480);
 			_camera.fillBackground = true;
 			_camera.backgroundColor = 0xFFFFFFFF;
 			AntG.addCamera(_camera);
-			addChild(_camera);
+			
 			AntG.track(_camera, "menuCamera");
 			AntG.storage.set("currentLevel",1);
 			
@@ -47,17 +52,19 @@ package
 			//Добавляем классы клипов которые необходимо растеризировать.
 			startCashing();
 			
+			super.create();
 			
-			AntG.cache.addClips(mcForRasterization); 
-			AntG.cache.addClips([clockOrange]);
-			AntG.cache.addClip(jointForMouse); 
-			AntG.cache.addClips([node1, node2, balloon1]); 
-			AntG.cache.addClip(leverImg); 
+			
+		
+			loader.addClips(mcForRasterization); 
+			loader.addClips(new <Class>[clockOrange,leverImg,jointForMouse]);
+			loader.addClips(new <Class>[node1, node2, balloon1]); 
+			
 			// Добавляем обработчик для завершения процесса растеризации.
-			AntG.cache.eventComplete.add(onCacheComplete);
-			
+			loader.eventComplete.add(onCacheComplete);
+			loader.start();
 			// Запускаем процесс растеризации клипов.
-			AntG.cache.cacheClips();
+			
 			initcbTypes();
 		}
 		
@@ -165,8 +172,6 @@ package
 		{
 			storage.set("levelArray", sharedObj.read("levelArray"));
 			storage.set("lastLevel", sharedObj.read("lastLevel"));
-			//storage = storage;
-			
 		}
 		
 		
@@ -174,15 +179,11 @@ package
 		/**
 		 * Обработчик события завершения растеризации.
 		 */
-		private function onCacheComplete():void
+		private function onCacheComplete(aLoader:AntAssetLoader):void
 		{
-			//
-			AntG.cache.eventComplete.remove(onCacheComplete);
+			loader.eventComplete.remove(onCacheComplete);
+			aLoader.destroy();
 			
-			/*mmenu = new AntActor();
-			mmenu.addAnimationFromCache("clockOrange");
-			add(mmenu);
-			*/
 			AntG.anthill.switchState(new menuMainState());
 			_started = true;
 			
@@ -202,7 +203,7 @@ package
 		}
 		override public function destroy():void
 		{
-			
+			AntG.removeCamera(_camera);
 			super.destroy();
 		}
 		

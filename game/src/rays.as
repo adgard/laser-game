@@ -121,13 +121,14 @@ package
 					  if (type == "heroRay") {
 						   if (rayResult != null) {
 							 rayBody.userData.act.canJump = true;
+							 rayBody.userData.act.rayFailedCounter = 0;
 							 return;
 						   }
 						   else {
 							     rayBody.userData.act.rayFailedCounter++; 
 								  if (rayBody.userData.act.rayFailedCounter >= 3) {
 									   rayBody.userData.act.canJump = false;
-									   
+									   rayBody.userData.act.rayFailedCounter = 0;
 									  }
 									return;  
 							    }
@@ -198,7 +199,7 @@ package
 		{
 			var m:Number = 0 ;
             m = _body.mass;
-			trace(m);
+			//trace(m);
 			               switch(_type) {
                                case "repulsion":
 								   _body.applyImpulse(_impulse.mul(m * 8),_pointImpulse);

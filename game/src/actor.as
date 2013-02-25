@@ -62,7 +62,16 @@ public class actor extends EventDispatcher
 	///////////////////////////////////////////////  
   private function updateBody():void {
 	
-   if (_body.userData.act is actorBox){ 
+	  
+	  
+	  
+   if (_body.userData.act is actorBox) {
+	   
+	   
+	   if (actorBox(_body.userData.act)._refType == "buttonMove") {
+		_body.position = Body(_body.userData.act.buttonNode._body).localPointToWorld(_body.userData.act.buttonNode.buttonNodePoint);
+		}	
+	   
     AntActor(_body.userData.graphic).x = _body.position.x;
 	AntActor(_body.userData.graphic).y = _body.position.y;
 	AntActor(_body.userData.graphic).angle = ((_body.rotation) * 180 / Math.PI) % 360 ;
@@ -80,9 +89,12 @@ public class actor extends EventDispatcher
 			  }
 		 } 
 	}
-	if (actorBox(_body.userData.act).gameType == "hero4") {
+	if (actorBox(_body.userData.act).gameType == "hero2") {
 		_body.userData.act.rayFailedCounter = 0;
 		}
+	
+		
+	
 	return;
    }
    if (_body.userData.act is actorCircle){ 
@@ -104,14 +116,14 @@ public class actor extends EventDispatcher
  public function removeActor():void {
 	  
 	   if (_body.userData.act is actorBox) { 
-           AntG.antSpace.remove(AntActor(_body.userData.graphic));
-		   _body.userData.graphic = null;
+           AntActor(_body.userData.graphic).kill();
+		   //AntActor(_body.userData.graphic).reset;
 		   AntG.space.bodies.remove(_body);
 	   return;
        }
 	   if (_body.userData.act is actorCircle){ 
-           AntG.antSpace.remove(AntActor(_body.userData.graphic));
-		   _body.userData.graphic = null;
+            AntActor(_body.userData.graphic).kill();
+		 //  _body.userData.graphic = null;
 		   AntG.space.bodies.remove(_body);
 	   return;
        }

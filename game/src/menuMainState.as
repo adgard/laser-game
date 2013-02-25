@@ -18,25 +18,24 @@ package
 		
 		protected var _started:Boolean = false;
 		
-		
-		public function menuMainState()
-		{
-			super();
-			
-			
-			_camera = new AntCamera(640, 480);
+		override public function create():void
+		{	
+			_camera = new AntCamera(0,0,640, 480);
 			_camera.fillBackground = true;
 			_camera.backgroundColor = 0xFFFFFFFF;
 			AntG.addCamera(_camera);
-			addChild(_camera);
+			
 			AntG.track(_camera, "TestUI camera");
 			
-			
-			
-			//AntG.debugger.perfomance.show();
+
 			AntG.debugger.monitor.clear();
 			showUI(new main_menu());
-			
+			_started = true;
+		}
+		public function menuMainState()
+		{
+			super();
+	
 		}
 		
 	

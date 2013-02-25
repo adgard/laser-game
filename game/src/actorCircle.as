@@ -17,6 +17,8 @@ package
 	 */
 	public class actorCircle extends actor
 	{
+		public var buttonNode:actor ;
+		public var buttonNodePoint:Vec2;
 		public var balloonEnabled:Boolean =  false;
 		public var rayEnabled:Boolean  = false;
 		public var rayArray:Array  = [];
@@ -96,7 +98,7 @@ package
 		    circle = new Circle(img.width/2);
 	       break;
 		   case "balloon":
-		    circle = new Circle(21);
+		    circle = new Circle(31);
 			
 	       break;
 		   

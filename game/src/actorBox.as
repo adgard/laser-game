@@ -31,6 +31,8 @@ package
 		public var canJump:Boolean  = false;
 		public var jumpRayEnabled:Boolean  = false;
 		public var rayFailedCounter:int  = 0;
+		public var buttonNode:actor;
+		public var buttonNodePoint:Vec2;
 		
 		
 		
@@ -63,7 +65,7 @@ package
 		public var gameType:String = "none";
 		
 		
-		public var balloonPoints:Array = [new Vec2( -15,-15),new Vec2( -15,15),new Vec2( 15,-15),new Vec2( 15,15)];
+		public var balloonPoints:Array = [new Vec2( -23,-23),new Vec2( -23,23),new Vec2( 23,-23),new Vec2( 23,23)];
 		
 		
 		
@@ -121,7 +123,7 @@ package
 		
 		  switch(shType) {
            case "width_height":
-		    polygon = new Polygon(Polygon.box((img.width-2) * scaleX, (img.height-2) * scaleY)) ;
+		    polygon = new Polygon(Polygon.box((img.width-3) * scaleX, (img.height-3) * scaleY)) ;
 	       break;
 		   
 		   case "balloon":
@@ -129,7 +131,7 @@ package
 	       break;
 		  
 		   case "herobox":
-		    polygon = new Polygon(Polygon.box((img.width - 2) * scaleX, (img.height - 2) * scaleY)) ;
+		    polygon = new Polygon(Polygon.box((img.width - 3) * scaleX, (img.height - 3) * scaleY)) ;
 			polygon.sensorEnabled  = false;
 			circle = new Circle(img.width / 2 - 2);
 			circle.sensorEnabled =  true;
@@ -286,10 +288,13 @@ package
 			for each (var refActor:* in actor(this).refArray ) {
 				switch (refActor._refType) {
 				 case "move":
-					 
-					 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);
-					 
+					 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);	 
 				 break;
+				 
+			    case "buttonMove":
+				 trace("enable button move");
+				break;
+				 
 				 
 				  case "rotate":
 					 

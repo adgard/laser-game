@@ -23,22 +23,21 @@ package
 	
 		private var i:int = 0 ;
 		protected var _started:Boolean = false;
-		
+		override public function create():void
+		{
+			_camera = new AntCamera(0, 0, 640, 480);
+			_camera.fillBackground = true;
+			_camera.backgroundColor = 0xFFFFFFFF;
+			AntG.addCamera(_camera);
+			AntG.track(_camera, "menuCamera");
+			showLevelIcons(new level_menu());
+			_started = true;
+		}	
 		
 		public function levelsState()
 		{
 			super();
-			
-			_started = false;
-			 
-			_camera = new AntCamera(640, 480);
-			_camera.fillBackground = true;
-			_camera.backgroundColor = 0xFFFFFFFF;
-			AntG.addCamera(_camera);
-			addChild(_camera);
-			AntG.track(_camera, "menuCamera");
-			showLevelIcons(new level_menu());
-			
+	
 		}
 	
 		private function showLevelIcons(m:MovieClip):void
@@ -50,7 +49,7 @@ package
               if (m.getChildAt(i) is MovieClip)
               {
                 var pObject:* = m.getChildAt(i);
-				var strName = String(pObject.name).substring(0, 6);
+				var strName:String = String(pObject.name).substring(0, 6);
 			
 				switch (strName) {
 					 case "button":

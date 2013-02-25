@@ -66,14 +66,9 @@ package
 		private var mouseJointBody:actorBox = null;
 		private var redactorEnabled:Boolean = false;
 		
-		public function playGameState()
-		
+		override public function create():void
 		{
-			_started = false;
-			new fakeClass();
-			super();
-			
-		 	levelNumber = AntG.storage.get("currentLevel");
+		  levelNumber = AntG.storage.get("currentLevel");
 			var levelBG:String = String("level" + (levelNumber-1));
 			var levelName:String = String("lev" + levelNumber);
 			var refLevel:Class = getDefinitionByName(levelName) as Class;
@@ -92,12 +87,12 @@ package
             parseLevel(currentLevel);
 			
 			 
-			_camera = new AntCamera(640, 480);
+			_camera = new AntCamera(0,0,640, 480);
 			_camera.fillBackground = true;
 			_camera.backgroundColor = 0xFFFFFFFF;
 			
 			AntG.addCamera(_camera);
-			addChild(_camera);
+			
 			AntG.track(_camera, "gameCamera");
 			
 			showUI(currentBG ,null,0);	
@@ -126,7 +121,14 @@ package
 			run = true;
 			
 			
-			
+				
+		}
+		
+		public function playGameState()
+		
+		{
+			new fakeClass();
+			super();
 		}
 		
 		
@@ -419,12 +421,15 @@ package
 			          mc.addAnimationFromCache(getQualifiedClassName(pObject));
 			          mc.x = pObject.x;
 					  mc.y = pObject.y;
-					  mc.tag = defGroup.numChildren + _tag;
-					  if(a!=null)
-						 a.add(mc); 
-						else 
-						 add(mc);
 					  
+					  if(a!=null){
+					   a.add(mc);
+					   mc.tag = defGroup.numChildren  +_tag;
+					   } 
+						else {
+						 add(mc);
+						 mc.tag = defGroup.numChildren + _tag;
+						}
 					 break;
 					}
 				
@@ -452,11 +457,28 @@ package
 		private function checkRefferences():void 
 		{
 			var currentNodeRefference:actor;
-			for each (var a:actor in actorArray) {
-				 if (a._refType == "button") {
+			var buttonNode:actor;
+			var bList:BodyList;
+			
+			var buttonNodePoint:Vec2;
+			for each (var a:* in actorArray) {
+				 if (a._type == "button") {
+					
+					 bList = _space.bodiesUnderPoint(a._body.position);
+					 if(bList.length > 1){
+					   if(bList.at(0).userData.act.type =="button" ){
+						 a.buttonNode = bList.at(1).userData.act;
+						 bList.at(1).userData.act.buttonNodePoint =  bList.at(1).worldPointToLocal(a._body.position);
+					   } 
+					   else 
+					   {
+						 a.buttonNode = bList.at(0).userData.act;
+						 bList.at(0).userData.act.buttonNodePoint = bList.at(0).worldPointToLocal(a._body.position);
+					   } 
+					 }
 					 currentNodeRefference = a;
 			          for each (var b:actor in actorArray) {
-					   if ((b != currentNodeRefference)&&(b._refType!="none")&&(b._refNumber == currentNodeRefference._refNumber)) {
+					   if ((b._refType!="none")&&(b._refNumber == currentNodeRefference._refNumber)) {
 						    currentNodeRefference.refArray.push(b);
 						    b.refArray.push(currentNodeRefference);
 						   }
@@ -494,7 +516,7 @@ package
 				  currentAntActor.y = AntG.mouse.y;
 				  currentAntActor.angle = 0;
 				  currentAntActor.addAnimationFromCache("jointForMouse");      
-				  mouseJointBody = new actorBox(currentAntActor, new Vec2(AntG.mouse.x,AntG.mouse.y), 0, "kinematic", "width_height", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),"false","false",0,"none","none");
+				  mouseJointBody = new actorBox(currentAntActor, new Vec2(AntG.mouse.x,AntG.mouse.y), 0, "kinematic", "width_height", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","none");
 				  _space.bodies.add(mouseJointBody._body);
 				  //actorArray.push(currentActor);
 				  //bList.at(0).worldPointToLocal(jointPoint), bList.at(1).worldPointToLocal(jointPoint)
@@ -506,8 +528,8 @@ package
 		 }
 		 else {
 			   
-				trace(mouseJointBody._body.position.x );
-				trace(mouseJointBody._body.position.y );
+				//trace(mouseJointBody._body.position.x );
+				//trace(mouseJointBody._body.position.y );
 				
 			  }
 			}
@@ -551,7 +573,7 @@ package
 					 
 				  case "attraction":
 					  if(bL.at(0).userData.act.rayEnabled == false){
-					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"attraction",200);
+					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"attraction",300);
 				       rayCastArray.push(currentRay);
 					   bL.at(0).userData.act.rayEnabled = true;
 					   bL.at(0).userData.act.rayArray.push(currentRay);
@@ -571,7 +593,7 @@ package
 				 
 				 case "emitter":
 					  if(bL.at(0).userData.act.rayEnabled == false){
-					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"emitter",200);
+					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"emitter",300);
 				       rayCastArray.push(currentRay);
 					   bL.at(0).userData.act.rayEnabled = true;
 					   bL.at(0).userData.act.rayArray.push(currentRay);
@@ -591,7 +613,7 @@ package
 				 
 				  case "killer":
 					  if(bL.at(0).userData.act.rayEnabled == false){
-					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"killer",200);
+					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"killer",300);
 				       rayCastArray.push(currentRay);
 					   bL.at(0).userData.act.rayEnabled = true;
 					   bL.at(0).userData.act.rayArray.push(currentRay);
@@ -610,7 +632,7 @@ package
 				 break;
 				  case "repulsion":
 					  if(bL.at(0).userData.act.rayEnabled == false){
-					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"repulsion",200);
+					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"repulsion",300);
 				       rayCastArray.push(currentRay);
 					   bL.at(0).userData.act.rayEnabled = true;
 					   bL.at(0).userData.act.rayArray.push(currentRay);
@@ -630,11 +652,11 @@ package
 				 
 				 
 				  case "fan":
-					currentRay =  new rays(bL.at(0), new Vec2( -10, -10), 0, "fan",200);
+					currentRay =  new rays(bL.at(0), new Vec2( -10, -10), 0, "fan",300);
 					rayCastArray.push(currentRay);
-					currentRay =  new rays(bL.at(0), new Vec2( -10, 0), 0, "fan",200);
+					currentRay =  new rays(bL.at(0), new Vec2( -10, 0), 0, "fan",300);
 					rayCastArray.push(currentRay);
-					currentRay =  new rays(bL.at(0), new Vec2( -10, 10), 0, "fan",200);
+					currentRay =  new rays(bL.at(0), new Vec2( -10, 10), 0, "fan",300);
 					rayCastArray.push(currentRay);
 					
 					
@@ -654,7 +676,7 @@ package
 		
 		private function heroJump(b:Body):void 
 		{
-			var imp:Vec2 = new Vec2(0, -200);
+			var imp:Vec2 = new Vec2(0, -300);
 			b.applyImpulse(imp, b.position);
 			b.userData.act.canJump = false;
 			
@@ -687,9 +709,9 @@ package
 			var r1:rays;
 			var r2:rays;
 			var r3:rays;
-			r1 = new rays(b, new Vec2(0,0), Math.PI,"heroRay",19);
-			r2 = new rays(b, new Vec2(0,0), -3*Math.PI / 4, "heroRay",23);
-			r3 = new rays(b, new Vec2(0,0), 3*Math.PI / 4, "heroRay",23);
+			r1 = new rays(b, new Vec2(0,0), Math.PI,"heroRay",26);
+			r2 = new rays(b, new Vec2(0,0), -3*Math.PI / 4, "heroRay",35);
+			r3 = new rays(b, new Vec2(0,0), 3*Math.PI / 4, "heroRay",35);
 			rayCastArray.push(r1);
 			
 			rayCastArray.push(r2);
@@ -703,7 +725,10 @@ package
 		private function levelCompleted():void 
 		{
 			
+			lcompl.tag = 999;
+			
 			add(lcompl);
+			defGroup.sort("tag");
 			stopEngines();
 			defGroup;
 		}
@@ -835,7 +860,7 @@ package
 				  add(currentAntActor);
 				  
 				  currentAntActor.gotoAndPlay(1);
-				  currentBalloon  = new actorCircle(currentAntActor, new Vec2(vec2.x,vec2.y-21), 0, "dynamic", "balloon", [0,0,0,0,0],"wood","circle",false,new Vec2(0,0),false,false,0,"none","balloon");
+				  currentBalloon  = new actorCircle(currentAntActor, new Vec2(vec2.x,vec2.y-30), 0, "dynamic", "balloon", [0,0,0,0,0],"wood","circle",false,new Vec2(0,0),false,false,0,"none","balloon");
 				  currentBalloon._body.gravMass = -currentBalloon._body.gravMass; 
 		          currentBalloon.heroConnected = b.userData.act;
 				  currentBalloon._body.compound = comp;
