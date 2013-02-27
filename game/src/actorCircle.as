@@ -17,6 +17,11 @@ package
 	 */
 	public class actorCircle extends actor
 	{
+		
+		public var ropeEnabled:Boolean =  false;
+		public var isRotating:Boolean =  false;
+		
+		public var ropeComp:actor;
 		public var buttonNode:actor ;
 		public var buttonNodePoint:Vec2;
 		public var balloonEnabled:Boolean =  false;

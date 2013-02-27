@@ -318,15 +318,7 @@ package
 				 
 				 trace("lever"); 
 				 }
-				//  currentJoint.compound = comp;
-				  
-				 
-				  
-				//  _space.compounds.add(comp);
-				  
-				  
-
-		
+				
 		}
 		
 		private function getPointForComplex(com:MovieClip):Array
@@ -539,13 +531,24 @@ package
 				   if ((bL.length > 0)) {
 				    switch (actor(Body(bL.at(0)).userData.act)._type) {
 					 case "hero1":
+						if (!bL.at(0).userData.act.ropeEnabled) {
 						 if(!bL.at(0).userData.act.balloonEnabled){
 						  createBalloon(new Vec2(AntG.mouse.x, AntG.mouse.y), bL.at(0));
 						  Body(bL.at(0)).userData.act.balloonEnabled = true;
 						 }
+						 }
+						  else{ 
+					           actorForDelete.push(bL.at(0).userData.act.ropeComp);
+					           bL.at(0).userData.act.ropeComp =  null;
+					           bL.at(0).userData.act.ropeEnabled = false;
+					          }
 					 break;
 				     
 				    case "hero2":
+						
+					 if (!bL.at(0).userData.act.ropeEnabled) {
+							
+						
 					    if(!Body(bL.at(0)).userData.act.jumpRayEnabled){
 						 addJumpRays(Body(bL.at(0)));
 						 
@@ -554,6 +557,14 @@ package
 					     heroJump(bL.at(0));
 						else 
 						 trace("in flying");
+						 
+					 }	
+					 else{ 
+					   actorForDelete.push(bL.at(0).userData.act.ropeComp);
+					   bL.at(0).userData.act.ropeComp =  null;
+					   bL.at(0).userData.act.ropeEnabled = false;
+					 }
+					 
 					 	 //createBalloon(new Vec2(AntG.mouse.x,AntG.mouse.y),bL.at(0));
 					/*	 if (Body(bL.at(0)).userData.act.contactCounterIce > 0) {
 							     
@@ -561,14 +572,27 @@ package
 							   }*/
 					 break;
 					 
-				     case "hero3":
+				 case "hero3":
+					 
+					  if (bL.at(0).userData.act.ropeEnabled) {
+						  actorForDelete.push(bL.at(0).userData.act.ropeComp);
+					      bL.at(0).userData.act.ropeComp =  null;
+					      bL.at(0).userData.act.ropeEnabled = false;
+						  } 
 					     actorForDelete.push(bL.at(0).userData.act);
 						 createExplosion(bL.at(0));
+						 
 						// gameCompleted();
 					 break;
 				    
 				 case "hero4":
-					   recreateHero(bL.at(0)); 
+					 if(!bL.at(0).userData.act.ropeEnabled)
+					   recreateHero(bL.at(0));
+					 else{ 
+					   actorForDelete.push(bL.at(0).userData.act.ropeComp);
+					   bL.at(0).userData.act.ropeComp =  null;
+					   bL.at(0).userData.act.ropeEnabled = false;
+					 }
 				 break; 
 					 
 				  case "attraction":
@@ -889,6 +913,7 @@ package
 		
 		private function createJoints():void 
 		{
+			var mcRopeArray:Array =[];
 		for each(var jmovie:componentJoint in mcForJoints) {
 			 var bList:BodyList;
 			 var jointPoint:Vec2 = new Vec2(jmovie.x, jmovie.y);
@@ -902,6 +927,8 @@ package
 						   var jPivot:PivotJoint = new PivotJoint(bList.at(0), bList.at(1), bList.at(0).worldPointToLocal(jointPoint), bList.at(1).worldPointToLocal(jointPoint));
 						   jPivot.ignore = jmovie.ignore;
 	                       jPivot.space = _space;
+						   
+						   jPivot.maxForce = 10000000;
 						  }
 					  else 
 					   trace("something wrong");
@@ -933,13 +960,179 @@ package
 					   trace("something wrong");
 				 break;
 				 
-				 
+				 case "rope":
+					//var jRope:* = 
+					 mcRopeArray.push([jmovie,false]);
+				 break;
 				 
 				 
 			     default:
 				 break;
 				 }
 			}
+			
+			for each (var comJ:Array  in mcRopeArray) {
+				var curJoint:componentJoint;
+				  if (!comJ[1]) {
+					  curJoint = comJ[0];
+			         for each (var comJ2:Array  in mcRopeArray) {
+					  if ((curJoint.counter == comJ2[0].counter) && (curJoint != comJ2[0])) {
+						comJ2[1] = true;
+						comJ[1] = true;
+						createRope(comJ2[0],curJoint);
+					  }
+					 }		  
+				  }
+				}
+		}
+		
+		private function createRope(Joint1:componentJoint, Joint2:componentJoint):void 
+		{
+			var v1:Vec2 = new Vec2(Joint1.x, Joint1.y);
+			var v2:Vec2 = new Vec2(Joint2.x, Joint2.y);
+			var v1_v2:Vec2 = new Vec2(v1.x - v2.x, v1.y - v2.y);
+			var v3:Vec2 = new Vec2(0,1);
+			
+			var nodeNumber:int = 0;
+			var nodeOther:Number = 0;
+			var nodeOtherV4:Vec2 ;
+			
+			
+			var currentAngle:Number = v1_v2.angle - Math.PI/2;
+			
+			var XY:Vec2 = new Vec2(); 
+			var distance:Number =  Vec2.distance(v1, v2);
+			var currentAntActor:AntActor  = new AntActor();
+			var currentPoint:Vec2 = new Vec2(0, 0);
+			var currentPointJoint:Vec2 = new Vec2(0, 0);
+			
+			var addThisToV1half:Vec2 = new Vec2(0, 6);
+			var addThisToV1:Vec2 = new Vec2(0, 12);
+			var currentNode:actor;
+			var currentJoint:PivotJoint;
+			var comp:Compound =  new Compound();
+			var bList:BodyList ;
+			var previousBody:Body ;
+			var lastBody:Body ;
+			var other2:Vec2  = new Vec2(0,3) ;
+			
+			
+			//v1_v2
+			
+			trace(v3.angle * 180/Math.PI);
+			trace(v1_v2.angle * 180/Math.PI);
+			other2 = other2.rotate(currentAngle);
+			trace(currentAngle * 180/Math.PI);
+				 bList = _space.bodiesUnderPoint(v1);  
+					  if (bList.length == 1) {
+						  
+						  lastBody = bList.at(0);
+						  
+					  }
+			_space.compounds.add(comp);
+			
+			nodeNumber = distance / 12;
+			nodeOther = distance - nodeNumber * 12;
+			
+			//currentPoint.x 
+			
+			addThisToV1half.rotate(currentAngle);
+			addThisToV1.rotate(currentAngle);
+			
+			currentPoint.x = v2.x + addThisToV1half.x;
+			currentPoint.y = v2.y + addThisToV1half.y;
+			
+		
+			
+			//first node
+			      currentAntActor.x = currentPoint.x;
+				  currentAntActor.y = currentPoint.y;
+				  currentAntActor.angle = currentAngle;
+				  
+				  currentAntActor.addAnimationFromCache("mc_node");      
+				  currentAntActor.tag = defGroup.numChildren;
+				  
+				  add(currentAntActor);
+				  currentNode = new actorBox(currentAntActor, currentPoint, currentAngle, "dynamic", "rope", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","rope");
+				  currentNode._body.compound = comp;
+				  actorArray.push(currentNode);
+			/// first joint
+			
+				 bList = _space.bodiesUnderPoint(v2);  
+					  if (bList.length == 2) {
+						   currentJoint = new PivotJoint(bList.at(0), bList.at(1), bList.at(0).worldPointToLocal(v2), bList.at(1).worldPointToLocal(v2));
+						   currentJoint.ignore = true;
+	                       currentJoint.compound = comp;
+						   currentJoint.maxForce = 10000000;
+						  }
+				  
+			for (var i:int = 1; i <= nodeNumber-1; i ++ ) {
+				  currentAntActor = new AntActor();
+			      currentAntActor.x = currentPoint.x + addThisToV1.x * i ;
+				  currentAntActor.y = currentPoint.y + addThisToV1.y * i;
+				  currentAntActor.angle = currentAngle;
+				  
+				  currentAntActor.addAnimationFromCache("mc_node");      
+				  currentAntActor.tag = defGroup.numChildren;
+				  
+				  add(currentAntActor);
+				  currentNode = new actorBox(currentAntActor, new Vec2(currentAntActor.x,currentAntActor.y), currentAngle, "dynamic", "rope", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","rope");
+				  currentNode._body.compound = comp;
+				  previousBody = currentNode._body;
+				  actorArray.push(currentNode);
+				  
+				   currentPointJoint.x = v2.x + addThisToV1.x * i;
+				   currentPointJoint.y = v2.y + addThisToV1.y * i;
+				   
+				  
+				   bList = _space.bodiesUnderPoint(currentPointJoint);  
+					  if (bList.length == 2) {
+						   currentJoint = new PivotJoint(bList.at(0), bList.at(1), bList.at(0).worldPointToLocal(currentPointJoint), bList.at(1).worldPointToLocal(currentPointJoint));
+						   currentJoint.ignore = true;
+	                       currentJoint.compound = comp;
+						   currentJoint.maxForce = 10000000;
+						  }
+				  
+			}
+			
+			      currentAntActor = new AntActor();
+				  currentAntActor.addAnimationFromCache("mc_node");      
+				  currentAntActor.scaleY = (nodeOther + 3) / 14;
+				  nodeOtherV4 = new Vec2 (0,nodeOther).rotate(currentAngle);
+			      currentAntActor.x = currentPoint.x + addThisToV1.x * (i-1) + nodeOtherV4.x + other2.x;
+				  currentAntActor.y = currentPoint.y + addThisToV1.y * (i-1) + nodeOtherV4.y + other2.y;
+				  currentAntActor.angle = currentAngle;
+				  
+				  
+				  currentAntActor.tag = defGroup.numChildren;
+				  
+				  add(currentAntActor);
+				  currentNode = new actorBox(currentAntActor, new Vec2(currentAntActor.x,currentAntActor.y), currentAngle, "dynamic", "rope", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","rope");
+				  currentNode._body.compound = comp;
+				
+				  actorArray.push(currentNode);
+			      /////last joints
+				  
+				  
+				          currentPointJoint.x = v2.x + addThisToV1.x * i;
+				          currentPointJoint.y = v2.y + addThisToV1.y * i;
+						  
+                           currentJoint = new PivotJoint(previousBody,currentNode._body, previousBody.worldPointToLocal(currentPointJoint), currentNode._body.worldPointToLocal(currentPointJoint));
+						   currentJoint.ignore = true;
+	                       currentJoint.compound = comp;
+						   currentJoint.maxForce = 10000000;
+						   
+						   currentJoint = new PivotJoint(currentNode._body, lastBody, currentNode._body.worldPointToLocal(v1), lastBody.worldPointToLocal(v1));
+						   currentJoint.ignore = true;
+	                       currentJoint.compound = comp;
+						   currentJoint.maxForce = 10000000;
+						   
+						   
+						   if (String(lastBody.userData.act.gameType).substring(0, 4) == "hero" ){
+						    lastBody.userData.act.ropeComp = currentNode;
+						    lastBody.userData.act.ropeEnabled =  true;
+						  }
+				  
 		}
 		
 		private function goToSouund(aButton:AntButton):void 

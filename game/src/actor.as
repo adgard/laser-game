@@ -77,7 +77,10 @@ public class actor extends EventDispatcher
 	AntActor(_body.userData.graphic).angle = ((_body.rotation) * 180 / Math.PI) % 360 ;
 	
 	//actorBox(_body.userData.act).velxy = _body.velocity;
-	if(actorBox(_body.userData.act).gameType == "button"){
+	if (actorBox(_body.userData.act).gameType == "button") {
+		
+		actorBox(_body.userData.act).checkAngle();
+		
 	 if ((actorBox(_body.userData.act).isContact == true) && (AntActor(_body.userData.graphic).currentFrame == 1)){
 	   AntActor(_body.userData.graphic).gotoAndStop(2);
 	   actorBox(_body.userData.act).enableRefference();

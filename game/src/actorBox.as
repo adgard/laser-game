@@ -21,6 +21,11 @@ package
 	 */
 	public class actorBox extends actor
 	{
+		public var ropeEnabled:Boolean =  false;
+		public var isRotating:Boolean =  false;
+		
+		public var ropeComp:actor;
+		public var rotateAngle:Number = 0 ;
 		
 		public var balloonEnabled:Boolean =  false;
 		public var xy:Vec2 = new Vec2(0, 0);
@@ -126,6 +131,10 @@ package
 		    polygon = new Polygon(Polygon.box((img.width-3) * scaleX, (img.height-3) * scaleY)) ;
 	       break;
 		   
+		   case "rope":
+		    polygon = new Polygon(Polygon.box((img.width) * scaleX, (img.height) * scaleY)) ;
+	       break;
+		   
 		   case "balloon":
 		    polygon = new Polygon(Polygon.box(4, 12)) ;
 	       break;
@@ -226,7 +235,11 @@ package
 		 	body.cbTypes.add(AntG.storage.get("dynamicCBT"));
 			body.cbTypes.add(AntG.storage.get("hero3CBT"));		
 		 break;
-		
+		 
+		case "rope":
+		 	body.cbTypes.add(AntG.storage.get("dynamicCBT"));
+		break;
+		 
 		 case "ice":
 			body.cbTypes.add(AntG.storage.get("iceCBT"));	
 		 break;
@@ -301,6 +314,13 @@ package
 					 Body(refActor._body).angularVel = refActor.velxy.x/4;
 					 
 				 break;
+				 
+				 case "rotateAngle":
+					 
+					 Body(refActor._body).angularVel = refActor.velxy.x/4;
+					 rotateAngle = refActor.velxy.y * Math.PI / 180;
+					 refActor.isRotating = true;
+				 break;
 			     default:
 				  trace("something default");
 				 break;
@@ -308,6 +328,15 @@ package
 				}
 			}
 			
+		}
+		public function checkAngle():void {
+			for each (var refActor:* in actor(this).refArray ) {
+			if(refActor.isRotating){	
+			 if (Math.abs(refActor._body.rotation) > rotateAngle) {
+				 Body(refActor._body).angularVel = 0;
+				 }
+			 }
+			}
 		}
 		
 		public function disableRefference():void 
@@ -326,7 +355,17 @@ package
 					 refActor.velxy.x = refActor._body.angularVel;
 					 
 					 Body(refActor._body).angularVel = 0;
-				 break;
+				  break;
+				  
+				  case "rotateAngle":
+					// refActor.velxy.x = refActor._body.angularVel;
+					 
+					// Body(refActor._body).angularVel = 0;
+					 
+					 
+				  break;
+				 
+				 
 			     default:
 				  trace("something default");
 				 break;

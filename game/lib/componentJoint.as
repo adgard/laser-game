@@ -13,6 +13,9 @@
                 
                 [Inspectable(jointType = "String", defaultValue = "pivot")]
                 public var jointType:String = "pivot";
+				 
+				[Inspectable(type="Number", defaultValue="0")]
+                public var counter:Number = 0;
 				
 		public function componentJoint() {
 			// constructor code
