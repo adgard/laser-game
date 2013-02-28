@@ -84,7 +84,7 @@ package
 		parseLevel(gc);
 		parseLevel(cf); 
 		 	
-		 for (var i:int = 1; i < 6; i++ ){
+		 for (var i:int = 1; i < 11; i++ ){
 		 	var levelName:String = String("lev" + i);
 			var levelBG:String = String("level" + (i-1));
 			

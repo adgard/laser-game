@@ -21,11 +21,15 @@ package
 	 */
 	public class actorBox extends actor
 	{
+		public var isRotatingD:Boolean =  false;
 		public var ropeEnabled:Boolean =  false;
 		public var isRotating:Boolean =  false;
+		public var bClickEnabled:Boolean =  false;
 		
 		public var ropeComp:actor;
 		public var rotateAngle:Number = 0 ;
+		public var initialAngle:Number = 0 ;
+		
 		
 		public var balloonEnabled:Boolean =  false;
 		public var xy:Vec2 = new Vec2(0, 0);
@@ -68,7 +72,7 @@ package
 		public var contactCounterIce:int = 0;
 		public var iceUnderHero:Array = [];
 		public var gameType:String = "none";
-		
+		public var rayType:String = "intake"
 		
 		public var balloonPoints:Array = [new Vec2( -23,-23),new Vec2( -23,23),new Vec2( 23,-23),new Vec2( 23,23)];
 		
@@ -78,9 +82,10 @@ package
 		
 		
 		
-		public function actorBox( img:AntActor,_xy:Vec2, _rotation:Number, _bType:String,_shType:String, _settings:Array, _mType:String, _pointsArray:Array,_type:String,_isSensor:Boolean,_velxy:Vec2,_isMoveable:Boolean,_isMoveSensor:Boolean,_refNumber:int, _refType:String,_gameType:String) 
+		public function actorBox( img:AntActor,_xy:Vec2, _rotation:Number, _bType:String,_shType:String, _settings:Array, _mType:String, _pointsArray:Array,_type:String,_isSensor:Boolean,_velxy:Vec2,_isMoveable:Boolean,_isMoveSensor:Boolean,_refNumber:int, _refType:String,_gameType:String, _rayType:String) 
 		{
 	      //space = space;
+		  rayType = _rayType;
 		  gameType = _gameType;
 		  refType = _refType;
 		  refNumber = _refNumber;
@@ -309,14 +314,21 @@ package
 				break;
 				 
 				 
-				  case "rotate":
+				 case "rotate":
 					 
 					 Body(refActor._body).angularVel = refActor.velxy.x/4;
 					 
 				 break;
 				 
+			 
+				  case "rotateDynamic":
+					
+					 refActor.isRotatingD = true;
+				 break;
+				 
+				 
 				 case "rotateAngle":
-					 
+					 initialAngle = refActor._body.rotation;
 					 Body(refActor._body).angularVel = refActor.velxy.x/4;
 					 rotateAngle = refActor.velxy.y * Math.PI / 180;
 					 refActor.isRotating = true;
@@ -332,13 +344,15 @@ package
 		public function checkAngle():void {
 			for each (var refActor:* in actor(this).refArray ) {
 			if(refActor.isRotating){	
-			 if (Math.abs(refActor._body.rotation) > rotateAngle) {
+			 if (Math.abs(initialAngle - refActor._body.rotation) > rotateAngle) {
 				 Body(refActor._body).angularVel = 0;
 				 }
 			 }
 			}
 		}
-		
+	 public function rotateDynamic():void {
+		 Body(body).applyAngularImpulse(this.velxy.x/4);
+	  }
 		public function disableRefference():void 
 		{
 			
@@ -358,13 +372,12 @@ package
 				  break;
 				  
 				  case "rotateAngle":
-					// refActor.velxy.x = refActor._body.angularVel;
-					 
-					// Body(refActor._body).angularVel = 0;
-					 
-					 
+					;
 				  break;
-				 
+				  case "rotateDynamic":
+					 
+					 refActor.isRotatingD = false;
+				 break;
 				 
 			     default:
 				  trace("something default");

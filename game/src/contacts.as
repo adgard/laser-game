@@ -186,15 +186,17 @@ package
 		private function beginCollisionHandlerButtons(cb:InteractionCallback):void 
 		{
 			// trace("begin");
-			 
+		if ((cb.int1.userData.act.buttonNode == cb.int2.userData.act ) || (cb.int2.userData.act.buttonNode == cb.int1.userData.act ))
+		  return;
+		 	 
 		 if (cb.int1.userData.act.gameType == "button") {
 			   //AntActor(cb.int1.userData.graphic).gotoAndStop(2);
-			   actorBox(cb.int1.userData.act).isContact = false;
+			   cb.int1.userData.act.isContact = false;
 			   cb.int1.userData.act.contactCounter++;
 			 }
 		 else {
 			  // AntActor(cb.int2.userData.graphic).gotoAndStop(2);
-			   actorBox(cb.int2.userData.act).isContact = false;
+			   cb.int2.userData.act.isContact = false;
 			   cb.int2.userData.act.contactCounter++;
 			  }	 
 		}
@@ -202,29 +204,35 @@ package
 		private function endCollisionHandlerButtons(cb:InteractionCallback):void 
 		{
 			// trace("end");
+			
+		 if ((cb.int1.userData.act.buttonNode == cb.int2.userData.act ) || (cb.int2.userData.act.buttonNode == cb.int1.userData.act ))
+		  return;
 		 if (cb.int1.userData.act.gameType == "button") {
 			   cb.int1.userData.act.contactCounter--;
 			   if (cb.int1.userData.act.contactCounter<=0) {
-				      actorBox(cb.int1.userData.act).isContact = false;
+				      (cb.int1.userData.act).isContact = false;
 				    }
 			   }
 		 else {
 			   cb.int2.userData.act.contactCounter--;
 			   if (cb.int2.userData.act.contactCounter<=0) {
-				      actorBox(cb.int2.userData.act).isContact = false;
+				      (cb.int2.userData.act).isContact = false;
 				    }
 			  }	 
 		}
 		private function ongoingCollisionHandlerButtons(cb:InteractionCallback):void
         {
 	   //  trace("ongoing");
+	   if ((cb.int1.userData.act.buttonNode == cb.int2.userData.act ) || (cb.int2.userData.act.buttonNode == cb.int1.userData.act ))
+		  return;
+		 
 		 if (cb.int1.userData.act.gameType == "button") {
 			   //AntActor(cb.int1.userData.graphic).gotoAndStop(2);
-			   actorBox(cb.int1.userData.act).isContact = true;
+			   (cb.int1.userData.act).isContact = true;
 			 }
 		 else {
 			  // AntActor(cb.int2.userData.graphic).gotoAndStop(2);
-			   actorBox(cb.int2.userData.act).isContact = true;
+			   (cb.int2.userData.act).isContact = true;
 			  }	 
 	     
 		 

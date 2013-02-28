@@ -137,19 +137,37 @@ package
 						////////////////////
 					  if (rayResult == null)
 						  return;
-						
-						 switch(rayResult.shape.body.userData.act.mType) {
-							 case "wood":
-					          applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
-							  return;
+						  
+						 switch(rayResult.shape.body.userData.act.rayType) {
+							 case "destroyed":
+								 if(type == "killer"){
+					              AntG.storage.get("actorForDelete").push(rayResult.shape.body.userData.act);
+							     }
+								 else 
+								  applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
+							   return;
+							   
+							 break;
+							 case "intake":
+					           applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
+							   return;
+							  break
+						     
+							 case "reflex":
+					          trace("reflex"); 
+						     break;
+							 
+							 case "pass":
+					          trace("pass"); 
+						     return;
+							 
 							 break;
 							 default:
-							 break;
 							 
 						 }
 						 
-					  if ((rayResult.shape.body.userData.act.mType != "steel")&&(rayResult.shape.body.userData.act.mType != "glass"))
-						 return;
+						 
+					  
 					 for (var i:int = 0 ; i < 4; i++ ) {
 			
 						   rayAngle = Math.PI - (prevVec2.angle - rayResult.normal.angle); 
@@ -164,7 +182,7 @@ package
 						  ray = new Ray(rayCurrentPoint, prevVec2);
 					     
 						  
-						  ray.maxDistance = 300;
+						  ray.maxDistance = distance;
 					      rayResult = AntG.space.rayCast(ray, false);
 						 
 					      if(rayResult!= null)
@@ -178,18 +196,32 @@ package
 						   if (rayResult == null)
 						  return;
 						  
-							 switch(rayResult.shape.body.userData.act.mType) {
-							 case "steel":
-					          applyImpulses(type, rayResult.shape.body, prevVec2, resultPt);
-							  return;
+						    switch(rayResult.shape.body.userData.act.rayType) {
+							 case "destroyed":
+								 if(type == "killer"){
+					              AntG.storage.get("actorForDelete").push(rayResult.shape.body.userData.act);
+							     }
+								 else 
+								  applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
+							   return;
+							 case "intake":
+					           applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
+							   return;
+							  break
+						     
+							 case "reflex":
+					          trace("reflex"); 
+						     break;
+							 
+							 case "pass":
+					          trace("pass"); 
+						     return;
+							 
 							 break;
 							 default:
-							 break;
 							 
 						 }
-							   
-						   if ((rayResult.shape.body.userData.act.mType != "steel")&&(rayResult.shape.body.userData.act.mType != "glass"))
-						 return;
+						 
 						   
 				    }
 		

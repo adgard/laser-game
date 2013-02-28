@@ -63,13 +63,17 @@ public class actor extends EventDispatcher
   private function updateBody():void {
 	
 	  
-	  
+	   if (_body.userData.act.isRotatingD) {
+		   _body.userData.act.rotateDynamic();
+		   }
 	  
    if (_body.userData.act is actorBox) {
 	   
-	   
+	  
 	   if (actorBox(_body.userData.act)._refType == "buttonMove") {
 		_body.position = Body(_body.userData.act.buttonNode._body).localPointToWorld(_body.userData.act.buttonNode.buttonNodePoint);
+		_body.rotation = Body(_body.userData.act.buttonNode._body).rotation;
+
 		}	
 	   
     AntActor(_body.userData.graphic).x = _body.position.x;
@@ -77,18 +81,18 @@ public class actor extends EventDispatcher
 	AntActor(_body.userData.graphic).angle = ((_body.rotation) * 180 / Math.PI) % 360 ;
 	
 	//actorBox(_body.userData.act).velxy = _body.velocity;
-	if (actorBox(_body.userData.act).gameType == "button") {
+	if ((_body.userData.act).gameType == "button") {
 		
-		actorBox(_body.userData.act).checkAngle();
+		(_body.userData.act).checkAngle();
 		
-	 if ((actorBox(_body.userData.act).isContact == true) && (AntActor(_body.userData.graphic).currentFrame == 1)){
+	 if (((_body.userData.act).isContact == true) && (AntActor(_body.userData.graphic).currentFrame == 1)){
 	   AntActor(_body.userData.graphic).gotoAndStop(2);
-	   actorBox(_body.userData.act).enableRefference();
+	   (_body.userData.act).enableRefference();
 	 }
 	else {
-		  if ((actorBox(_body.userData.act).isContact == false) && (AntActor(_body.userData.graphic).currentFrame == 2)) {
+		  if (((_body.userData.act).isContact == false) && (AntActor(_body.userData.graphic).currentFrame == 2)) {
 	            AntActor(_body.userData.graphic).gotoAndStop(1);
-				actorBox(_body.userData.act).disableRefference();
+				(_body.userData.act).disableRefference();
 			  }
 		 } 
 	}

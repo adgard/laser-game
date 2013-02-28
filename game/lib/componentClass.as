@@ -59,6 +59,9 @@
 				[Inspectable(typeElement = "string", defaultValue = "none")]
                 public var typeElement:String = "none";
 				
+				[Inspectable(rayType = "string", defaultValue = "intake")]
+                public var rayType:String = "intake";
+				
 				
 				
 		public function componentClass() {
