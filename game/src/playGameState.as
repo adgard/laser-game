@@ -223,7 +223,7 @@ package
 				 switch (c.name2) {
 					
 					 case "rectangle":
-					 if(c.typeElement != "lever"){
+					 if(c.refType != "lever"){
 					   currentActor = new actorBox(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType);
 					   _space.bodies.add(currentActor._body);
 					   actorArray.push(currentActor);
@@ -300,7 +300,7 @@ package
 				  currentAntActor.addAnimationFromCache("leverImg");      
 				  add(currentAntActor);
 				   currentAntActor.tag = defGroup.numChildren;
-				  currentLever = new actorBox(currentAntActor, new Vec2(c.x, c.y-12), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType); 
+				  currentLever = new actorBox(currentAntActor, new Vec2(c.x, c.y-20), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType); 
 				  _space.bodies.add(currentLever._body);
 				  
 				  actorArray.push(currentLever);
