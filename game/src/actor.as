@@ -2,6 +2,9 @@
 
 {
   import adobe.utils.CustomActions;
+  import nape.constraint.AngleJoint;
+  import nape.constraint.Constraint;
+  import nape.constraint.PivotJoint;
   import nape.phys.Body;
   import ru.antkarlov.anthill.AntActor;
   import ru.antkarlov.anthill.*;
@@ -75,7 +78,31 @@ public class actor extends EventDispatcher
 		_body.rotation = Body(_body.userData.act.buttonNode._body).rotation;
 
 		}	
-	   
+	  
+		if (actorBox(_body.userData.act)._refType == "lever") {
+		 var j:AngleJoint = AngleJoint(_body.constraints.at(0));
+		 
+		// trace("rotation= " + (j.body1.rotation - j.body2.rotation));
+		 if ((j.body1.rotation - j.body2.rotation) > 0.2) {
+		 	if(actorBox(_body.userData.act).LeverType!=-1){
+			 actorBox(_body.userData.act).LeverType = -1; 
+		     trace("left action")
+		    _body.userData.act.enableRefference();
+			}
+		 }
+		 else 
+		   if ((j.body1.rotation - j.body2.rotation) < -0.2) {
+			  if(actorBox(_body.userData.act).LeverType!=1){
+		       trace("right action");
+			  _body.userData.act.disableRefference();
+			  actorBox(_body.userData.act).LeverType = 1; 
+			  }
+		   }
+		   else {
+			     actorBox(_body.userData.act).LeverType =0; 
+			    }
+		}
+		
     AntActor(_body.userData.graphic).x = _body.position.x;
 	AntActor(_body.userData.graphic).y = _body.position.y;
 	AntActor(_body.userData.graphic).angle = ((_body.rotation) * 180 / Math.PI) % 360 ;

@@ -2,6 +2,7 @@ package
 {
 	import flash.display.MovieClip;
 	import flash.geom.Vector3D;
+	import nape.dynamics.InteractionFilter;
 	import nape.geom.Vec2;
 	import nape.phys.Body;
 	import ru.antkarlov.anthill.*
@@ -18,6 +19,7 @@ package
 	 */
 	public class rays 
 	{
+		private var filt:InteractionFilter =  new InteractionFilter();
 		private var rayActor:AntActor =  new AntActor();
 		public var rayMC:MovieClip =  new MovieClip();
 		private var rayAnimation:AntAnimation;
@@ -44,6 +46,11 @@ package
 		{
 		     distance = _distance;
 			 type = _type;
+			 //filt.sensorGroup = 0x00000010;
+			 //filt.sensorMask = 0x00000100;
+			   filt.collisionGroup =0x00000010;
+		     //filt.collisionMask = 0x00000100;
+			 
 			 rayActor = new AntActor();
 			 rayActor.tag = 500;
 			 switch(type) {
@@ -105,7 +112,7 @@ package
 			ray = new Ray(new Vec2(rayBody.position.x-rayOffSet.x,rayBody.position.y-rayOffSet.y), prevVec2);// Vec2.fromPolar(1,bL.at(0).rotation));
 					 ray.maxDistance = distance;
 					
-					 rayResult = AntG.space.rayCast(ray, false);
+					 rayResult = AntG.space.rayCast(ray, false,filt);
 					if(rayResult!= null)
 					 resultPt = ray.at(rayResult.distance);
 					else 
@@ -183,7 +190,7 @@ package
 					     
 						  
 						  ray.maxDistance = distance;
-					      rayResult = AntG.space.rayCast(ray, false);
+					      rayResult = AntG.space.rayCast(ray, false,filt);
 						 
 					      if(rayResult!= null)
 					       resultPt = ray.at(rayResult.distance);

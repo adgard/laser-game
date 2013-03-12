@@ -93,7 +93,12 @@ package
 		
 		private function goToPlayMenu(aButton:AntButton):void 
 		{
-		    AntG.storage.set("currentLevel", int((String(aButton.currentAnimation).substring(4,5))));
+		    
+			if(String(aButton.currentAnimation).length<6)
+			 AntG.storage.set("currentLevel", int((String(aButton.currentAnimation).substring(4, 5))));
+			else 
+			  AntG.storage.set("currentLevel", int((String(aButton.currentAnimation).substring(4, 6))));
+			
 			aButton.eventClick.remove(goToPlayMenu);
 			AntG.anthill.switchState(new playGameState());	
 		}

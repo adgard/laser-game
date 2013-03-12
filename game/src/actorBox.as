@@ -3,6 +3,7 @@ package
 	import flash.display.InteractiveObject;
 	import flash.geom.Point;
 	import nape.callbacks.*;
+	import nape.dynamics.InteractionFilter;
 	import nape.shape.Circle;
 	
 	import nape.geom.Vec2;
@@ -21,6 +22,8 @@ package
 	 */
 	public class actorBox extends actor
 	{
+		public var LeverType:int =  0;
+	    public var filt:InteractionFilter = new InteractionFilter();
 		public var isRotatingD:Boolean =  false;
 		public var ropeEnabled:Boolean =  false;
 		public var isRotating:Boolean =  false;
@@ -93,6 +96,10 @@ package
 		  isMoveable = _isMoveable;
 		  isMoveSensor = _isMoveSensor;
 		  
+		  filt.sensorGroup = 0x000000001;
+		  filt.sensorMask =  0x000000001;
+		  filt.collisionGroup =0x00000001;
+		  filt.collisionMask = 0x00000001;
 		  velxy = _velxy;
 		  isSensor =  _isSensor;
 		  xy = _xy;
@@ -144,6 +151,9 @@ package
 		    polygon = new Polygon(Polygon.box(4, 12)) ;
 	       break;
 		  
+		   case "48_48":
+		    polygon = new Polygon(Polygon.box(48, 48)) ;
+	       break;
 		   case "herobox":
 		    polygon = new Polygon(Polygon.box((img.width - 3) * scaleX, (img.height - 3) * scaleY)) ;
 			polygon.sensorEnabled  = false;
@@ -162,6 +172,8 @@ package
 			 polygon = new Polygon(Polygon.box(img.width * scaleX, img.height * scaleY));
 	       break;
 		}	
+		
+		 
 		if (rotation!=0)
 		 trace(rotation);
 		 //img.
@@ -258,25 +270,25 @@ package
 		 break;
 		
 		 case "emitter":
-		  	 polygon.filter.collisionMask = 0x000000001;
-			 polygon.filter.collisionGroup = 0x000000001;
+		  	// polygon.filter.collisionMask = 0x000000001;
+			// polygon.filter.collisionGroup = 0x000000001;
 			 
 		 break;
 		 
 		  case "fan":
-		  	 polygon.filter.collisionMask = 0x000000001;
-			 polygon.filter.collisionGroup = 0x000000001;
+		  	// polygon.filter.collisionMask = 0x000000001;
+			// polygon.filter.collisionGroup = 0x000000001;
 			 
 		break;	
 		
 		 case "attraction":
-		  	 polygon.filter.collisionMask = 0x000000001;
-			 polygon.filter.collisionGroup = 0x000000001;
+		  	 //polygon.filter.collisionMask = 0x000000001;
+			 //polygon.filter.collisionGroup = 0x000000001;
 			 
 		break;	
 		 case "repulsion":
-		  	 polygon.filter.collisionMask = 0x000000001;
-			 polygon.filter.collisionGroup = 0x000000001;
+		  	 //polygon.filter.collisionMask = 0x000000001;
+			 //polygon.filter.collisionGroup = 0x000000001;
 			 
 		break;	
 		 
@@ -289,6 +301,19 @@ package
 		 break;
 				
 		}
+		
+		
+		switch(rayType) {
+           case "pass":
+		     polygon.filter = filt;
+		   break;
+		   
+	       default:
+		     //polygon.group = 0x000000001;
+		   break;
+		}	
+		
+		
 		body.rotation = rotation;	
 		body.shapes.add(polygon);
 		if (shType == "herobox") 
@@ -313,7 +338,10 @@ package
 				 trace("enable button move");
 				break;
 				 
-				 
+				case "leverMove":
+				 trace("lever left");
+				 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);	 
+				break;
 				 case "rotate":
 					 
 					 Body(refActor._body).angularVel = refActor.velxy.x/4;
@@ -364,6 +392,11 @@ package
 					 
 					 refActor._body.velocity.setxy(0,0);
 				 break;
+				 
+				case "leverMove":
+				 trace("lever right");
+				 refActor._body.velocity.setxy(-refActor.velxy.x, -refActor.velxy.y);	 
+				break;
 				 
 				  case "rotate":
 					 refActor.velxy.x = refActor._body.angularVel;

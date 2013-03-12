@@ -58,6 +58,8 @@ package
 		private var mcArrayFromLevel:Array = [];
 		private var mcForRasterization:Array = []; 
 		private var mcForPhysics:Array = []; 
+		private var mcForDecoration:Array = []; 
+		
 		private var mcComplexForPhysics:Array = []; 
 		private var mcForJoints:Array = [];
 	
@@ -193,7 +195,8 @@ package
 		       
 			 }
 			 else {
-				   
+				    if(mcForDecoration.indexOf(getQualifiedClassName(MovieClip(obj)))==-1)
+				         mcForDecoration.push(obj);
 				  }
 				  
 			/* if(mcForRasterization.indexOf(getDefinitionByName(getQualifiedClassName(MovieClip(obj))) as Class)==-1){
@@ -210,6 +213,18 @@ package
 				 var currentAnimation:AntAnimation;
 				 var c:componentClass;
 				 var currentAntActor:AntActor = new AntActor();
+				
+				for each(var m:MovieClip in mcForDecoration) {
+				  //currentAnimation.destroy();
+				  currentAntActor = new AntActor();
+				  currentAntActor.x = m.x;
+				  currentAntActor.y = m.y;
+				  currentAntActor.angle = m.rotation * Math.PI / 180;
+				  currentAntActor.addAnimationFromCache(getQualifiedClassName(MovieClip(m)));
+				  currentAntActor.tag = defGroup.numChildren;
+				  add(currentAntActor);
+				}	 
+				 
 				 
 			for each(c in mcForPhysics) {
 				 // currentAnimation.destroy();
@@ -273,14 +288,14 @@ package
 					  break;
 					 }
 				  //currentActor = new 
-				}	
+				}
+				
+
 		}
 		
 		private function createLever(c:componentClass):void 
 		{
-		
-		
-			
+	
 			 var currentAntActor:AntActor = new AntActor();
 				 
 				 var currentLever:actorBox;
@@ -305,7 +320,6 @@ package
 				  
 				  actorArray.push(currentLever);
 
-				  
 				  pJoint = new PivotJoint(currentLever._body, b2, currentLever._body.worldPointToLocal(new Vec2(c.x, c.y)), b2.worldPointToLocal(new Vec2(c.x, c.y)));
 				  pJoint.ignore = true;
 				//  pJoint.maxForce = 1000;
@@ -533,14 +547,16 @@ package
 					 case "hero1":
 						if (!bL.at(0).userData.act.ropeEnabled) {
 						 if(!bL.at(0).userData.act.balloonEnabled){
-						  createBalloon(new Vec2(AntG.mouse.x, AntG.mouse.y), bL.at(0));
-						  Body(bL.at(0)).userData.act.balloonEnabled = true;
-						 }
+						  //createBalloon(new Vec2(AntG.mouse.x, AntG.mouse.y), bL.at(0));
+						  //Body(bL.at(0)).userData.act.balloonEnabled = true;
+						   bL.at(0).gravMass = -bL.at(0).gravMass; 
+						  }
 						 }
 						  else{ 
 					           actorForDelete.push(bL.at(0).userData.act.ropeComp);
 					           bL.at(0).userData.act.ropeComp =  null;
 					           bL.at(0).userData.act.ropeEnabled = false;
+							  //bL.at(0).gravMass = -bL.at(0).gravMass;
 					          }
 					 break;
 				     

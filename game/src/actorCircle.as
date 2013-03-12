@@ -1,6 +1,7 @@
 package  
 {
 	import flash.geom.Point;
+	import nape.dynamics.InteractionFilter;
 	import nape.geom.Vec2;
 	import nape.phys.Body;
 	import nape.phys.Material;
@@ -17,7 +18,8 @@ package
 	 */
 	public class actorCircle extends actor
 	{
-		
+		public var filt:InteractionFilter = new InteractionFilter();
+		public var LeverType:int =  0;
 		public var contactCounter:int = 0;
 		public var ropeEnabled:Boolean =  false;
 		public var isRotating:Boolean =  false;
@@ -68,7 +70,12 @@ package
 			gameType = _gameType;
 		   refType = _refType;
 		  refNumber = _refNumber;
+		  filt.sensorGroup = 0x00000001;
+		  filt.sensorMask =  0x00000001;
+		  filt.collisionGroup =0x00000001;
+		  filt.collisionMask = 0x00000001;
 		  
+		 
 		  isMoveable = _isMoveable;
 		  isMoveSensor = _isMoveSensor;
 		  velxy = _velxy;
@@ -209,6 +216,17 @@ package
 			  }
 		     break;	
 			}
+			
+		switch(rayType) {
+           case "pass":
+		     circle.filter = filt;
+		   break;
+		   
+	       default:
+		     //polygon.group = 0x000000001;
+		   break;
+		}	
+			
 		body.rotation = rotation;	
 		body.shapes.add(circle);
 		if (shType == "herocircle") 
