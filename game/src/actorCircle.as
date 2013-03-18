@@ -1,6 +1,7 @@
 package  
 {
 	import flash.geom.Point;
+	import nape.constraint.PivotJoint;
 	import nape.dynamics.InteractionFilter;
 	import nape.geom.Vec2;
 	import nape.phys.Body;
@@ -18,12 +19,14 @@ package
 	 */
 	public class actorCircle extends actor
 	{
+		public var magnetEnabled:Boolean =  false;
+		
 		public var filt:InteractionFilter = new InteractionFilter();
 		public var LeverType:int =  0;
 		public var contactCounter:int = 0;
 		public var ropeEnabled:Boolean =  false;
 		public var isRotating:Boolean =  false;
-		public var isRotatingD:Boolean =  false;
+		public var isRotatingD:int =  0;
 		
 		public var bClickEnabled:Boolean =  false;
 		public var rotateAngle:Number = 0 ;
@@ -52,6 +55,10 @@ package
 		public var isMoveSensor:Boolean = false;
 		public var isMoveable:Boolean = false;
 		
+		public var magnetJointInited:Boolean = false;
+		public var magnetJoint:PivotJoint;
+		
+		
 		public var refType:String = "none";
 		public var refNumber:int = 0;
 		
@@ -62,11 +69,14 @@ package
 		public var canJump:Boolean  = false;
 		public var heroConnected:actor = null;
 		public var rayType:String = "intake"
+		public var isStatic:Boolean = false;
 		
+		public var magnetStatInited:Boolean = false;
 		
-		public function actorCircle( img:AntActor,_xy:Vec2, _rotation:Number, _bType:String,_shType:String, _settings:Array, _mType:String,_type:String,_isSensor:Boolean,_velxy:Vec2,_isMoveable:Boolean,_isMoveSensor:Boolean,_refNumber:int, _refType:String,_gameType:String, _rayType:String) 
+		public function actorCircle( img:AntActor,_xy:Vec2, _rotation:Number, _bType:String,_shType:String, _settings:Array, _mType:String,_type:String,_isSensor:Boolean,_velxy:Vec2,_isMoveable:Boolean,_isMoveSensor:Boolean,_refNumber:int, _refType:String,_gameType:String, _rayType:String,_isStatic:Boolean) 
 		{
-	      rayType = _rayType;
+	     isStatic = _isStatic;
+			rayType = _rayType;
 			gameType = _gameType;
 		   refType = _refType;
 		  refNumber = _refNumber;
@@ -189,8 +199,15 @@ package
 				body.cbTypes.add(AntG.storage.get("buttonCBT"));	
 			 break;
 			 
+			 case "magnet":
+		 	   body.cbTypes.add(AntG.storage.get("magnetCBT"));		
+		     break;
+			 case "magnetStat":
+		 	  body.cbTypes.add(AntG.storage.get("magnetStatCBT"));		
+		     break;
 			 case "balloon":
 				body.cbTypes.add(AntG.storage.get("balloonCBT"));	
+				
 			 break;
 			 
 			 case "ice":
@@ -235,19 +252,24 @@ package
 		body.allowRotation = true;
 		
 		body.position.setxy(xy.x, xy.y);
+		if (isStatic) {
+             img.clearAnimations();
+			}
 		body.userData.graphic = img;
 		
+		if (shType == "balloon")
+		body.gravMass = - 2*body.gravMass;
 		//body.
 		super(body,refType,refNumber);
 		}
 		
 		public function checkAngle():void {
 			for each (var refActor:* in actor(this).refArray ) {
-			if(refActor.isRotating){	
-			 if (Math.abs(initialAngle - refActor._body.rotation) > rotateAngle) {
+			 if(refActor.isRotating){	
+			  if (Math.abs(initialAngle - refActor._body.rotation) > rotateAngle) {
 				 Body(refActor._body).angularVel = 0;
 				 }
-			 }
+			  }
 			}
 		}
 		public function enableRefference():void 
@@ -270,7 +292,13 @@ package
 					 rotateAngle = refActor.velxy.y * Math.PI / 180;
 					 refActor.isRotating = true;
 				 break;
+				 case "moveMagnet":
+					 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);	 
+				 break;
 				 
+				  case "magnetStat":
+					 refActor.magnetEnabled = true; 
+				 break;
 				  case "rotateStop":
 					 //initialAngle = refActor._body.rotation;
 					 Body(refActor._body).angularVel = refActor.velxy.x/4;
@@ -278,10 +306,14 @@ package
 					 refActor.isRotating = true;
 				 break;
 				 
-				  case "rotateDynamic":
-					
-					 refActor.isRotatingD = true;
+			 case "rotateDynamic":   
+				 if(velxy.x == 1)
+					 refActor.isRotatingD = 1;
+				 else 
+				     refActor.isRotatingD = -1;
+				  
 				 break;
+				 
 				 
 				 
 				  case "rotate":
@@ -298,7 +330,11 @@ package
 			
 		}
 	  public function rotateDynamic():void {
-		 Body(body).applyAngularImpulse(this.velxy.x*10,false);
+		 if(isRotatingD == 1 ) 
+		  Body(body).applyAngularImpulse(this.velxy.x * 10, false);
+		 if(isRotatingD == -1 ) 
+		  Body(body).applyAngularImpulse(-this.velxy.x * 10, false);
+		 
 	  }
 		public function disableRefference():void 
 		{
@@ -311,7 +347,21 @@ package
 					 
 					 refActor._body.velocity.setxy(0,0);
 				 break;
+				  case "moveMagnet":
+					 refActor.velxy.x = refActor._body.velocity.x;
+					 refActor.velxy.y = refActor._body.velocity.y;
+					 
+					 refActor._body.velocity.setxy(0, 0);
+					  if (refActor.magnetJointInited) {
+						   AntG.space.constraints.remove(refActor.magnetJoint);
+						   refActor.magnetJoint = null;
+						   refActor.magnetJointInited = false;
+						  }
+				 break;
 				 
+				 case "magnetStat":
+					refActor.magnetEnabled = false;
+				 break;
 				  case "rotate":
 					 refActor.velxy.x = refActor._body.angularVel;
 					 
@@ -323,12 +373,10 @@ package
 				  break;
 				  case "rotateDynamic":
 					 
-					 refActor.isRotatingD = false;
+					 refActor.isRotatingD = 0;
 				 break;
-				  case "rotateStop":
-					 //initialAngle = refActor._body.rotation;
+				  case "rotateStop": 
 					 Body(refActor._body).angularVel = 0;
-					 //rotateAngle = refActor.velxy.y * Math.PI / 180;
 					 refActor.isRotating = false;
 				 break;
 				  

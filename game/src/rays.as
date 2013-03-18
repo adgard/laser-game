@@ -129,6 +129,7 @@ package
 						   if (rayResult != null) {
 							 rayBody.userData.act.canJump = true;
 							 rayBody.userData.act.rayFailedCounter = 0;
+							 rayMC.visible =  false;
 							 return;
 						   }
 						   else {
@@ -161,7 +162,7 @@ package
 							  break
 						     
 							 case "reflex":
-					          trace("reflex"); 
+					         // trace("reflex"); 
 						     break;
 							 
 							 case "pass":

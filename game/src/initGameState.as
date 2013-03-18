@@ -84,7 +84,7 @@ package
 		parseLevel(gc);
 		parseLevel(cf); 
 		 	
-		 for (var i:int = 1; i < 11; i++ ){
+		 for (var i:int = 1; i < 26; i++ ){
 		 	var levelName:String = String("lev" + i);
 			var levelBG:String = String("level" + (i-1));
 			
@@ -131,6 +131,8 @@ package
 			
 			 var balloonCbType:CbType = new CbType();
 			 var collectCbType:CbType = new CbType();
+			 var magnetCbType:CbType = new CbType();
+			 var magnetStatCbType:CbType = new CbType();
 			 
 			 
 			AntG.storage.set("buttonCBT", buttonCbType);
@@ -146,6 +148,8 @@ package
 			AntG.storage.set("spikeCBT", spikeCbType);
 			AntG.storage.set("balloonCBT", balloonCbType);
 			AntG.storage.set("collectCBT", collectCbType);
+			AntG.storage.set("magnetCBT", magnetCbType);
+			AntG.storage.set("magnetStatCBT", magnetStatCbType);
 			
 		}
 	

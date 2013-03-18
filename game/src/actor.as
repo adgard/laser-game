@@ -66,7 +66,7 @@ public class actor extends EventDispatcher
   private function updateBody():void {
 	
 	  
-	   if (_body.userData.act.isRotatingD) {
+	   if (_body.userData.act.isRotatingD !=0) {
 		   _body.userData.act.rotateDynamic();
 		   }
 	  
@@ -131,7 +131,16 @@ public class actor extends EventDispatcher
 	
 	return;
    }
-   if (_body.userData.act is actorCircle){ 
+   if (_body.userData.act is actorCircle) { 
+	   
+	   
+	   	if ((_body.userData.act).gameType == "button") {
+		
+		(_body.userData.act).checkAngle();
+		
+
+	}
+	   
     AntActor(_body.userData.graphic).x = _body.position.x;
 	AntActor(_body.userData.graphic).y = _body.position.y;
 	AntActor(_body.userData.graphic).angle = ((_body.rotation) * 180/Math.PI) % 360 ;

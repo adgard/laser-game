@@ -3,6 +3,7 @@ package
 	import flash.display.InteractiveObject;
 	import flash.geom.Point;
 	import nape.callbacks.*;
+	import nape.constraint.PivotJoint;
 	import nape.dynamics.InteractionFilter;
 	import nape.shape.Circle;
 	
@@ -23,6 +24,8 @@ package
 	public class actorBox extends actor
 	{
 		public var LeverType:int =  0;
+		public var magnetEnabled:Boolean =  false;
+		
 	    public var filt:InteractionFilter = new InteractionFilter();
 		public var isRotatingD:Boolean =  false;
 		public var ropeEnabled:Boolean =  false;
@@ -31,7 +34,7 @@ package
 		
 		public var ropeComp:actor;
 		public var rotateAngle:Number = 0 ;
-		public var initialAngle:Number = 0 ;
+		public var initialAngle:Number = -1 ;
 		
 		
 		public var balloonEnabled:Boolean =  false;
@@ -45,6 +48,10 @@ package
 		public var rayFailedCounter:int  = 0;
 		public var buttonNode:actor;
 		public var buttonNodePoint:Vec2;
+		public var magnetJointInited:Boolean = false;
+		public var magnetJoint:PivotJoint;
+		
+		public var magnetStatInited:Boolean = false;
 		
 		
 		
@@ -75,7 +82,10 @@ package
 		public var contactCounterIce:int = 0;
 		public var iceUnderHero:Array = [];
 		public var gameType:String = "none";
-		public var rayType:String = "intake"
+		public var rayType:String = "intake";
+		
+		public var isStatic:Boolean = false;
+		
 		
 		public var balloonPoints:Array = [new Vec2( -23,-23),new Vec2( -23,23),new Vec2( 23,-23),new Vec2( 23,23)];
 		
@@ -85,10 +95,14 @@ package
 		
 		
 		
-		public function actorBox( img:AntActor,_xy:Vec2, _rotation:Number, _bType:String,_shType:String, _settings:Array, _mType:String, _pointsArray:Array,_type:String,_isSensor:Boolean,_velxy:Vec2,_isMoveable:Boolean,_isMoveSensor:Boolean,_refNumber:int, _refType:String,_gameType:String, _rayType:String) 
+		public function actorBox( img:AntActor,_xy:Vec2, _rotation:Number, _bType:String,_shType:String, _settings:Array, _mType:String, _pointsArray:Array,_type:String,_isSensor:Boolean,_velxy:Vec2,_isMoveable:Boolean,_isMoveSensor:Boolean,_refNumber:int, _refType:String,_gameType:String, _rayType:String,_isStatic:Boolean) 
 		{
 	      //space = space;
+		  isStatic = _isStatic;
 		  rayType = _rayType;
+		  if (rayType == "reflex")
+		   trace(rayType);
+		  
 		  gameType = _gameType;
 		  refType = _refType;
 		  refNumber = _refNumber;
@@ -253,6 +267,14 @@ package
 			body.cbTypes.add(AntG.storage.get("hero3CBT"));		
 		 break;
 		 
+		 case "magnet":
+		 	body.cbTypes.add(AntG.storage.get("magnetCBT"));		
+		 break;
+		 
+		 case "magnetStat":
+		 	body.cbTypes.add(AntG.storage.get("magnetStatCBT"));		
+		 break;
+		 
 		case "rope":
 		 	body.cbTypes.add(AntG.storage.get("dynamicCBT"));
 		break;
@@ -321,6 +343,9 @@ package
 		
 		
 		body.position.setxy(xy.x, xy.y);
+		if (isStatic) {
+             img.visible = false;
+			}
 		body.userData.graphic = img;
 		//body.
 		super(body,refType,refNumber);
@@ -332,6 +357,15 @@ package
 				switch (refActor._refType) {
 				 case "move":
 					 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);	 
+				 break;
+				 
+				 case "moveMagnet":
+					 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);	 
+				 break;
+				 
+				 
+				 case "magnetStat":
+					 refActor.magnetEnabled = true;	 
 				 break;
 				 
 			    case "buttonMove":
@@ -349,16 +383,20 @@ package
 				 break;
 				 
 			 
-				  case "rotateDynamic":
-					
+				 case "rotateDynamic":	
 					 refActor.isRotatingD = true;
 				 break;
 				 
-				 
-				 case "rotateAngle":
-					 initialAngle = refActor._body.rotation;
+				 case "rotateStop":
 					 Body(refActor._body).angularVel = refActor.velxy.x/4;
-					 rotateAngle = refActor.velxy.y * Math.PI / 180;
+					refActor.isRotating = true;
+				 break;
+			     case "rotateAngle":
+				    if(initialAngle==-1){
+					 initialAngle = refActor._body.rotation;
+					  rotateAngle = refActor.velxy.y * Math.PI / 180;
+					}
+					 Body(refActor._body).angularVel = refActor.velxy.x/4;
 					 refActor.isRotating = true;
 				 break;
 			     default:
@@ -386,6 +424,7 @@ package
 			
 			for each (var refActor:* in actor(this).refArray ) {
 				switch (refActor._refType) {
+				 
 				 case "move":
 					 refActor.velxy.x = refActor._body.velocity.x;
 					 refActor.velxy.y = refActor._body.velocity.y;
@@ -393,6 +432,26 @@ package
 					 refActor._body.velocity.setxy(0,0);
 				 break;
 				 
+				 case "moveMagnet":
+					 refActor.velxy.x = refActor._body.velocity.x;
+					 refActor.velxy.y = refActor._body.velocity.y;
+					 
+					 refActor._body.velocity.setxy(0, 0);
+					  if (refActor.magnetJointInited) {
+						   AntG.space.constraints.remove(refActor.magnetJoint);
+						   refActor.magnetJoint = null;
+						   refActor.magnetJointInited = false;
+						  }	 
+				 break;
+				 
+				 case "magnetStat":
+					 refActor.magnetEnabled = false;	 
+				 break;
+				 
+				 case "rotateStop":
+					 Body(refActor._body).angularVel = 0;
+					 refActor.isRotating = false;
+				 break;
 				case "leverMove":
 				 trace("lever right");
 				 refActor._body.velocity.setxy(-refActor.velxy.x, -refActor.velxy.y);	 

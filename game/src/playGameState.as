@@ -239,7 +239,7 @@ package
 					
 					 case "rectangle":
 					 if(c.refType != "lever"){
-					   currentActor = new actorBox(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType);
+					   currentActor = new actorBox(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType,c.isStatic);
 					   _space.bodies.add(currentActor._body);
 					   actorArray.push(currentActor);
 					 }
@@ -249,7 +249,7 @@ package
 				      
 					   
 					  case "circle":
-					   currentActor = new actorCircle(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType);
+					   currentActor = new actorCircle(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType,c.isStatic);
 					   _space.bodies.add(currentActor._body);
 					   actorArray.push(currentActor);
 					  break;
@@ -277,7 +277,7 @@ package
 					  
 				  case "complex":
 					  getPointForComplex(c);
-					   currentActor = new actorBox(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,a[1],c.name2,false,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType);
+					   currentActor = new actorBox(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,a[1],c.name2,false,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType,c.isStatic);
 					  _space.bodies.add(currentActor._body);
 					   actorArray.push(currentActor);
 					  break;
@@ -315,7 +315,7 @@ package
 				  currentAntActor.addAnimationFromCache("leverImg");      
 				  add(currentAntActor);
 				   currentAntActor.tag = defGroup.numChildren;
-				  currentLever = new actorBox(currentAntActor, new Vec2(c.x, c.y-20), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType); 
+				  currentLever = new actorBox(currentAntActor, new Vec2(c.x, c.y-20), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType,c.isStatic); 
 				  _space.bodies.add(currentLever._body);
 				  
 				  actorArray.push(currentLever);
@@ -522,7 +522,7 @@ package
 				  currentAntActor.y = AntG.mouse.y;
 				  currentAntActor.angle = 0;
 				  currentAntActor.addAnimationFromCache("jointForMouse");      
-				  mouseJointBody = new actorBox(currentAntActor, new Vec2(AntG.mouse.x,AntG.mouse.y), 0, "kinematic", "width_height", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","none", "pass");
+				  mouseJointBody = new actorBox(currentAntActor, new Vec2(AntG.mouse.x,AntG.mouse.y), 0, "kinematic", "width_height", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","none", "pass",false);
 				  _space.bodies.add(mouseJointBody._body);
 				  //actorArray.push(currentActor);
 				  //bList.at(0).worldPointToLocal(jointPoint), bList.at(1).worldPointToLocal(jointPoint)
@@ -595,8 +595,10 @@ package
 					      bL.at(0).userData.act.ropeComp =  null;
 					      bL.at(0).userData.act.ropeEnabled = false;
 						  } 
-					     actorForDelete.push(bL.at(0).userData.act);
-						 createExplosion(bL.at(0));
+					     
+						  createExplosion(bL.at(0));
+						  actorForDelete.push(bL.at(0).userData.act);
+						 
 						 
 						// gameCompleted();
 					 break;
@@ -727,10 +729,13 @@ package
 				   }
                   else {
 					       if ((bL.length > 1)) {
-							    for (var i:int = 0; i < bL.length ; i++ )
+							    for (var i:int = 0; i < bL.length ; i++ ) {
+									var b:Body = Body(bL.at(i));
+								trace(actor(Body(bL.at(i)).userData.act)._type);	
 				              switch (actor(Body(bL.at(i)).userData.act)._type) {
+								  
 							    case "button":
-								 if(bL.at(1).userData.act.refType == "buttonClick"){
+								 if(bL.at(i).userData.act.refType == "buttonClick"){
 				                  if (bL.at(i).userData.act.bClickEnabled) {
 					               bL.at(i).userData.act.bClickEnabled = false;
 					               AntActor(bL.at(i).userData.graphic).gotoAndStop(1);
@@ -747,6 +752,7 @@ package
 								break;
 							  }
 							 }
+						   }
 					   }
 				 }
 			}
@@ -754,7 +760,7 @@ package
 		
 		private function heroJump(b:Body):void 
 		{
-			var imp:Vec2 = new Vec2(0, -300);
+			var imp:Vec2 = new Vec2(0, -400);
 			b.applyImpulse(imp, b.position);
 			b.userData.act.canJump = false;
 			
@@ -823,8 +829,8 @@ package
 		
 		private function createExplosion(bb:Body):void 
 		{
-			const explosionRadius:Number = 128;
-			const explosionStr:Number = 200;
+			const explosionRadius:Number = 100;
+			const explosionStr:Number = 400;
 			
             var bodyList:BodyList = _space.bodiesInCircle(bb.position, explosionRadius, false, null, bodyList);
                        
@@ -838,8 +844,12 @@ package
                                 {
                                         var b:Body = bodyList.at(i);
                                   
-                                        if (!b.isDynamic())
+                                        if (!b.isDynamic()) {
+											if (bodyList.at(i).userData.act._type == "ice")
+											 actorForDelete.push(bodyList.at(i).userData.act);
+											 
                                                 continue;
+										}	
                                        
                                         var len:Number = Geom.distanceBody(bb, b, v1, v2);
                                        
@@ -913,7 +923,7 @@ package
 				  currentAntActor.angle = 0;
 				  currentAntActor.addAnimationFromCache("node1");      
 				  add(currentAntActor);
-				  currentNode1 = new actorBox(currentAntActor, new Vec2(vec2.x,vec2.y-5), 0, "dynamic", "balloon", [0,0,0,0,0],"wood",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","balloon","destroyed");
+				  currentNode1 = new actorBox(currentAntActor, new Vec2(vec2.x,vec2.y-5), 0, "dynamic", "balloon", [0,0,0,0,0],"wood",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","balloon","destroyed",false);
 				  currentNode1._body.compound = comp;
 				  currentNode1.heroConnected = b.userData.act;
 				  actorArray.push(currentNode1);
@@ -924,7 +934,7 @@ package
 				  currentAntActor.angle = 0;
 				  currentAntActor.addAnimationFromCache("node2");      
 				  add(currentAntActor);
-				  currentNode2 = new actorBox(currentAntActor, new Vec2(vec2.x,vec2.y-5), 0, "dynamic", "balloon", [0,0,0,0,0],"wood",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","balloon","destroyed");
+				  currentNode2 = new actorBox(currentAntActor, new Vec2(vec2.x,vec2.y-5), 0, "dynamic", "balloon", [0,0,0,0,0],"wood",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","balloon","destroyed",false);
 				  currentNode2._body.compound = comp;
 				  currentNode2.heroConnected = b.userData.act;
 				  actorArray.push(currentNode2);
@@ -938,7 +948,7 @@ package
 				  add(currentAntActor);
 				  
 				  currentAntActor.gotoAndPlay(1);
-				  currentBalloon  = new actorCircle(currentAntActor, new Vec2(vec2.x,vec2.y-30), 0, "dynamic", "balloon", [0,0,0,0,0],"wood","circle",false,new Vec2(0,0),false,false,0,"none","balloon","destroyed");
+				  currentBalloon  = new actorCircle(currentAntActor, new Vec2(vec2.x,vec2.y-30), 0, "dynamic", "balloon", [0,0,0,0,0],"wood","circle",false,new Vec2(0,0),false,false,0,"none","balloon","destroyed",false);
 				  currentBalloon._body.gravMass = -currentBalloon._body.gravMass; 
 		          currentBalloon.heroConnected = b.userData.act;
 				  currentBalloon._body.compound = comp;
@@ -1000,7 +1010,7 @@ package
 					  else 
 					   trace("something wrong");
 				 break;
-				 joi
+				 
 				 case "motor":
 					
 					  bList = _space.bodiesUnderPoint(jointPoint);
@@ -1108,7 +1118,7 @@ package
 				  currentAntActor.tag = defGroup.numChildren;
 				  
 				  add(currentAntActor);
-				  currentNode = new actorBox(currentAntActor, currentPoint, currentAngle, "dynamic", "rope", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","rope","destroyed");
+				  currentNode = new actorBox(currentAntActor, currentPoint, currentAngle, "dynamic", "rope", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","rope","destroyed",false);
 				  currentNode._body.compound = comp;
 				  actorArray.push(currentNode);
 			/// first joint
@@ -1131,7 +1141,7 @@ package
 				  currentAntActor.tag = defGroup.numChildren;
 				  
 				  add(currentAntActor);
-				  currentNode = new actorBox(currentAntActor, new Vec2(currentAntActor.x,currentAntActor.y), currentAngle, "dynamic", "rope", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","rope","destroyed");
+				  currentNode = new actorBox(currentAntActor, new Vec2(currentAntActor.x,currentAntActor.y), currentAngle, "dynamic", "rope", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","rope","destroyed",false);
 				  currentNode._body.compound = comp;
 				  previousBody = currentNode._body;
 				  actorArray.push(currentNode);
@@ -1162,7 +1172,7 @@ package
 				  currentAntActor.tag = defGroup.numChildren;
 				  
 				  add(currentAntActor);
-				  currentNode = new actorBox(currentAntActor, new Vec2(currentAntActor.x,currentAntActor.y), currentAngle, "dynamic", "rope", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","rope","destroyed");
+				  currentNode = new actorBox(currentAntActor, new Vec2(currentAntActor.x,currentAntActor.y), currentAngle, "dynamic", "rope", [0,0,0,0,0],"steel",[],"rectangle",false,new Vec2(0,0),false,false,0,"none","rope","destroyed",false);
 				  currentNode._body.compound = comp;
 				
 				  actorArray.push(currentNode);

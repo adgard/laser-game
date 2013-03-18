@@ -1,6 +1,9 @@
 package  
 {
 	import nape.callbacks.*;
+	import nape.constraint.PivotJoint;
+	import nape.constraint.WeldJoint;
+	import nape.dynamics.CollisionArbiter;
 	import nape.phys.*
 	
 	import nape.callbacks.InteractionCallback;
@@ -23,8 +26,175 @@ package
 			initCollisionListenersHero2Ice();	
 			initCollisionListenersSpikes();	
 			initCollisionListenersCollectble();	
+			initCollisionListenersMagnet();	
+			initCollisionListenersMagnetStat();	
 			
 	    }
+		
+		private function initCollisionListenersMagnetStat():void 
+		{
+			var opt1:OptionType = new OptionType([AntG.storage.get("magnetStatCBT")]);
+		    var opt2:OptionType = new OptionType(AntG.storage.get("dynamicCBT"));
+		   
+			var ongoingCollideListener:InteractionListener = new InteractionListener(CbEvent.ONGOING, InteractionType.SENSOR, opt1, opt2, ongoingCollisionHandlerMagnetStat);
+			var endCollideListener:InteractionListener = new InteractionListener(CbEvent.END, InteractionType.SENSOR, opt1, opt2, endCollisionHandlerMagnetStat);
+			
+			
+			 AntG.space.listeners.add(ongoingCollideListener);
+			 AntG.space.listeners.add(endCollideListener);
+		}
+		
+		private function endCollisionHandlerMagnetStat(cb:InteractionCallback):void 
+		{
+			if (Body(cb.int1).userData.act.gameType == "magnetStat") {
+			 if(Body(cb.int1).userData.act.magnetEnabled == true) { 		
+			  if(Body(cb.int2).userData.act.magnetStatInited == true){	
+			      Body(cb.int2).userData.act.magnetStatInited = false;
+				  Body(cb.int2).gravMass = -Body(cb.int2).gravMass; 
+				}
+			 }
+			}
+		    if (Body(cb.int2).userData.act.gameType == "magnetStat") {
+			 if(Body(cb.int2).userData.act.magnetEnabled == true) { 		
+			  if(Body(cb.int1).userData.act.magnetStatInited == true){	
+			      Body(cb.int1).userData.act.magnetStatInited = false;
+				  Body(cb.int1).gravMass = -Body(cb.int1).gravMass; 
+				}
+			 }
+			}
+			 
+		}
+		
+		private function ongoingCollisionHandlerMagnetStat(cb:InteractionCallback):void 
+		{
+			if(Body(cb.int1).userData.act.gameType == "magnetStat"){
+			 if(Body(cb.int1).userData.act.magnetEnabled==true) { 
+			  if(Body(cb.int2).userData.act.magnetStatInited == false){	
+			      Body(cb.int2).userData.act.magnetStatInited = true;
+				  Body(cb.int2).gravMass = -Body(cb.int2).gravMass; 
+				}
+			 }
+			 else {
+				   if(Body(cb.int2).userData.act.magnetStatInited == true){
+				     Body(cb.int2).userData.act.magnetStatInited = false;  
+				     Body(cb.int2).gravMass = -Body(cb.int2).gravMass;
+				   }
+				  }
+			}
+		 
+		 if(Body(cb.int2).userData.act.gameType == "magnetStat"){
+			 if(Body(cb.int2).userData.act.magnetEnabled==true) { 
+			  if(Body(cb.int1).userData.act.magnetStatInited == false){	
+			      Body(cb.int1).userData.act.magnetStatInited = true;
+				  
+				}
+			 }
+			 else {
+				    if(Body(cb.int1).userData.act.magnetStatInited == true){
+				     Body(cb.int1).userData.act.magnetStatInited = false;  
+				     Body(cb.int1).gravMass = -Body(cb.int2).gravMass;
+				   }
+				  }
+			}	
+			
+		}
+		
+		private function initCollisionListenersMagnet():void 
+		{
+			var opt1:OptionType = new OptionType([AntG.storage.get("magnetCBT")]);
+		    var opt2:OptionType = new OptionType(AntG.storage.get("dynamicCBT"));
+		   
+			var beginCollideListener:InteractionListener = new InteractionListener(CbEvent.BEGIN, InteractionType.COLLISION, opt1, opt2, beginCollisionHandlerMagnet);
+			
+			 AntG.space.listeners.add(beginCollideListener);
+		}
+		
+		private function beginCollisionHandlerMagnet(cb:InteractionCallback):void 
+		{
+			if (cb.int1.userData.act.gameType == "magnet") { 
+				var jPiv:PivotJoint;
+				var colArb:CollisionArbiter;
+			  if (cb.int1.userData.act.magnetJointInited == false) {	
+				  
+				   if (Body(cb.int2).constraints.length > 0)
+						   {
+					        var b:Body;
+							b = PivotJoint(Body(cb.int2).constraints.at(0)).body1;
+							if (b != cb.int2) {
+								b = b;
+								}
+							else {
+								  b = PivotJoint(Body(cb.int2).constraints.at(0)).body2;
+								 }
+								 
+							 if(b!=null){
+							   b.userData.act.magnetJointInited = false;
+					           b.userData.act.magnetJoint.space = null;
+				               b.userData.act.magnetJoint = null;   
+						    }
+						   }
+				  
+			               Body(cb.int1).velocity.setxy(-Body(cb.int1).velocity.x, -Body(cb.int1).velocity.y);
+						   
+						   if (cb.arbiters.at(0).collisionArbiter != null)
+						    colArb = cb.arbiters.at(0).collisionArbiter;
+						   else 
+						    colArb = cb.arbiters.at(1).collisionArbiter;
+						    
+						   jPiv = new PivotJoint(Body(cb.int1), Body(cb.int2), Body(cb.int1).worldPointToLocal(colArb.contacts.at(0).position),Body(cb.int2).worldPointToLocal(colArb.contacts.at(0).position));
+						   jPiv.ignore = false;
+	                       jPiv.space = AntG.space;
+				           cb.int1.userData.act.magnetJointInited = true;	
+						   cb.int1.userData.act.magnetJoint = jPiv;
+				           trace("init joint");
+						
+			  }
+			 }
+		    else {
+			  if(cb.int2.userData.act.magnetJointInited== false){	
+			     
+				       
+				     if (Body(cb.int1).constraints.length > 0)
+						   {
+					        var b:Body;
+							b = PivotJoint(Body(cb.int1).constraints.at(0)).body1;
+							if (b != cb.int1) {
+								b = b;
+								}
+							else {
+								  b = PivotJoint(Body(cb.int1).constraints.at(0)).body2;
+								 }
+								 
+							 if(b!=null){
+							   b.userData.act.magnetJointInited = false;
+					           b.userData.act.magnetJoint.space = null;
+				               b.userData.act.magnetJoint = null;   
+						    }
+						   }
+				  
+				  
+				        if (cb.arbiters.at(0).collisionArbiter != null)
+						    colArb = cb.arbiters.at(0).collisionArbiter;
+						else 
+						   colArb = cb.arbiters.at(1).collisionArbiter;     
+				  
+				       Body(cb.int2).velocity.setxy(-Body(cb.int2).velocity.x, -Body(cb.int2).velocity.y);
+				       jPiv = new PivotJoint(Body(cb.int2), Body(cb.int1), Body(cb.int2).worldPointToLocal(colArb.contacts.at(0).position),Body(cb.int1).worldPointToLocal(colArb.contacts.at(0).position));
+					   jPiv.ignore = false;
+	                   jPiv.space = AntG.space;
+				       trace("init joint");
+				       cb.int2.userData.act.magnetJointInited = true;
+					   cb.int2.userData.act.magnetJoint = jPiv;
+					
+				}
+				  else {
+				     cb.int2.userData.act.magnetJointInited = false;
+					 cb.int2.userData.act.magnetJoint.space = null;
+				     cb.int2.userData.act.magnetJoint = null;
+				           
+				   }
+			}
+		}
 		
 		public function initCollisionListenersCollectble():void 
 		{
