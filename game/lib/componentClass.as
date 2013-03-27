@@ -62,6 +62,8 @@
 				[Inspectable(rayType = "string", defaultValue = "intake")]
                 public var rayType:String = "intake";
 				
+				[Inspectable(arrowType = "string", defaultValue = "none")]
+                public var arrowType:String = "yellow";
 				
 				
 		public function componentClass() {

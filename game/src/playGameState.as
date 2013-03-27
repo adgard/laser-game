@@ -38,6 +38,8 @@ package
 		private var starCounter:int = 3;
 		private var lcompl:AntActor = new AntActor();
 		private var gcompl:AntActor = new AntActor();
+		private var lFailed:AntActor = new AntActor();
+		
 		private var actorForDelete:Array = [];
 		private var _space:Space;
         private var _timeStep:Number = 1/30.0;
@@ -81,6 +83,8 @@ package
 			
 			AntG.storage.set("actorForDelete", actorForDelete);
 			AntG.storage.set("rays", rayCastArray);
+			AntG.storage.set("gameStatus", "none");
+			
 			
 			
 			
@@ -97,7 +101,7 @@ package
 			
 			AntG.track(_camera, "gameCamera");
 			
-			showUI(currentBG ,null,0);	
+			//showUI(currentBG ,null,0);	
 			
 			
 			createPhysObject();
@@ -111,10 +115,14 @@ package
 			
 			showUI(new play_menu(), null, 0);
 			lcompl.tag = 200;
+			
 			showUI(new lCompleted(), lcompl,200);
 			gcompl.tag = 200;
 			
-			showUI(new gCompleted(), gcompl,200);
+			showUI(new level_failed(), lFailed, 201);
+			lFailed.tag = 201;
+			
+			showUI(new gCompleted(), gcompl,202);
 			defGroup.sort("tag");
 			
 		    //add(lcompl);
@@ -238,9 +246,24 @@ package
 				 switch (c.name2) {
 					
 					 case "rectangle":
-					 if(c.refType != "lever"){
+					 if (c.refType != "lever") {
+						
 					   currentActor = new actorBox(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,[],c.name2,c.isSensor,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType,c.isStatic);
+		   
 					   _space.bodies.add(currentActor._body);
+					   
+					   if (c.arrowType != "none") {
+						 var comArr:componentIcon = componentIcon(c.getChildByName("a")) 	 
+						  if(comArr){
+						     currentAntActor = new AntActor();
+				             currentAntActor.x = comArr.x;
+				             currentAntActor.y = comArr.y;
+				             currentAntActor.angle = comArr.rotation * Math.PI / 180;
+				             currentAntActor.addAnimationFromCache("arrows");
+							  actorBox(currentActor).addArrow(currentAntActor,c.arrowType);
+						  }
+						 }
+					    
 					   actorArray.push(currentActor);
 					 }
 					 else 
@@ -390,6 +413,18 @@ package
 						  case "button_prestart":
 							btn.eventClick.add(goToRestart);
 						  break;
+						  
+						   case "button_frestart":
+							btn.eventClick.add(goToRestart);
+						  break;
+						  case "button_fsolution":
+							trace("solution");//btn.eventClick.add(goToRestart);
+						  break;
+						  case "button_flevels":
+							btn.eventClick.add(goToMenu);
+						  break;
+						  
+						  
 						  case "button_psolution":
 							trace("solution");//btn.eventClick.add(goToRestart);
 						  break;
@@ -456,6 +491,7 @@ package
 			
 			lcompl.kill();
 			gcompl.kill();
+			
 		}
 	
 		
@@ -484,7 +520,7 @@ package
 					 }
 					 currentNodeRefference = a;
 			          for each (var b:actor in actorArray) {
-					   if ((b._refType!="none")&&(b._refNumber == currentNodeRefference._refNumber)) {
+					   if ((b._refType!="none")&&(b._refNumber == currentNodeRefference._refNumber)&&(b._refType!="button")) {
 						    currentNodeRefference.refArray.push(b);
 						    b.refArray.push(currentNodeRefference);
 						   }
@@ -635,11 +671,12 @@ package
 				       rayCastArray.push(currentRay);
 					   bL.at(0).userData.act.rayEnabled = true;
 					   bL.at(0).userData.act.rayArray.push(currentRay);
+					   AntActor(bL.at(0).userData.graphic).gotoAndStop(2);
 					  }
 					  else 
 					    {
 						 bL.at(0).userData.act.rayEnabled = false;	
-						 
+						 AntActor(bL.at(0).userData.graphic).gotoAndStop(1);
 						 for  each (var r:rays in bL.at(0).userData.act.rayArray){
 						  raysForDelete.push(r);
 						  r.clear();
@@ -651,15 +688,16 @@ package
 				 
 				 case "emitter":
 					  if(bL.at(0).userData.act.rayEnabled == false){
-					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"emitter",400);
+					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"emitter",640);
 				       rayCastArray.push(currentRay);
 					   bL.at(0).userData.act.rayEnabled = true;
 					   bL.at(0).userData.act.rayArray.push(currentRay);
+					   AntActor(bL.at(0).userData.graphic).gotoAndStop(2);
 					  }
 					  else 
 					    {
 						 bL.at(0).userData.act.rayEnabled = false;	
-						 
+						 AntActor(bL.at(0).userData.graphic).gotoAndStop(1);
 						 for  each (var r:rays in bL.at(0).userData.act.rayArray){
 						  raysForDelete.push(r);
 						  r.clear();
@@ -675,11 +713,12 @@ package
 				       rayCastArray.push(currentRay);
 					   bL.at(0).userData.act.rayEnabled = true;
 					   bL.at(0).userData.act.rayArray.push(currentRay);
+					   AntActor(bL.at(0).userData.graphic).gotoAndStop(2);
 					  }
 					  else 
 					    {
 						 bL.at(0).userData.act.rayEnabled = false;	
-						 
+						 AntActor(bL.at(0).userData.graphic).gotoAndStop(1);
 						 for  each (var r:rays in bL.at(0).userData.act.rayArray){
 						  raysForDelete.push(r);
 						  r.clear();
@@ -694,11 +733,12 @@ package
 				       rayCastArray.push(currentRay);
 					   bL.at(0).userData.act.rayEnabled = true;
 					   bL.at(0).userData.act.rayArray.push(currentRay);
+					   AntActor(bL.at(0).userData.graphic).gotoAndStop(2);
 					  }
 					  else 
 					    {
 						 bL.at(0).userData.act.rayEnabled = false;	
-						 
+						 AntActor(bL.at(0).userData.graphic).gotoAndStop(1);
 						 for  each (var r:rays in bL.at(0).userData.act.rayArray){
 						  raysForDelete.push(r);
 						  r.clear();
@@ -820,6 +860,12 @@ package
 		private function gameCompleted():void 
 		{
 			add(gcompl);
+			stopEngines();
+		}
+		
+		private function levelFailed():void 
+		{
+			add(lFailed);
 			stopEngines();
 		}
 		private function stopEngines():void 
@@ -1092,7 +1138,10 @@ package
 					  if (bList.length == 1) {
 						  
 						  lastBody = bList.at(0);
-						  
+						   if (lastBody.userData.act.gameType == "balloon") {
+							   lastBody.compound = comp;
+							   }
+						  	  
 					  }
 			_space.compounds.add(comp);
 			
@@ -1126,6 +1175,8 @@ package
 				 bList = _space.bodiesUnderPoint(v2);  
 					  if (bList.length == 2) {
 						   currentJoint = new PivotJoint(bList.at(0), bList.at(1), bList.at(0).worldPointToLocal(v2), bList.at(1).worldPointToLocal(v2));
+						  
+								   
 						   currentJoint.ignore = true;
 	                       currentJoint.compound = comp;
 						   currentJoint.maxForce = 10000000;
@@ -1296,11 +1347,8 @@ package
 						itemToDelete._body.compound.bodies.at(i).userData.act.removeActor();
 				   }
 			       		
-			//		itemToDelete.removeActor();
-			        if (itemToDelete._body.userData.act.shType == "balloon")
-					  Body(itemToDelete._body).userData.act.heroConnected.balloonEnabled = false;
-					  
-			        _space.compounds.remove(itemToDelete._body.compound);
+			        if ((itemToDelete._body.userData.act.shType == "balloon")||(itemToDelete._body.userData.act.shType == "rope"))
+ 			        _space.compounds.remove(itemToDelete._body.compound);
 				  } 
 			  n = actorForDelete.indexOf(itemToDelete);
 			  if(n!=-1)
@@ -1315,6 +1363,10 @@ package
 			 a.update();
 			
 			super.postUpdate();
+			
+			if (AntG.storage.get("gameStatus") == "failed") {
+				 levelFailed();
+				}
 		}
 		override public function destroy():void
 		{

@@ -224,9 +224,9 @@ package
 		
 		private function initCollisionListenersSpikes():void 
 		{
-		   //var opt1:OptionType = new OptionType([AntG.storage.get("hero2CBT"),AntG.storage.get("hero1CBT"),AntG.storage.get("hero3CBT"),AntG.storage.get("hero4CBT"),AntG.storage.get("balloonCBT")]);
+		   var opt1:OptionType = new OptionType([AntG.storage.get("hero2CBT"),AntG.storage.get("hero1CBT"),AntG.storage.get("hero3CBT"),AntG.storage.get("hero4CBT"),AntG.storage.get("balloonCBT")]);
 		   var opt2:OptionType = new OptionType(AntG.storage.get("spikeCBT"));
-		   var opt1:OptionType = new OptionType(AntG.storage.get("balloonCBT"));
+		  //var opt1:OptionType = new OptionType(AntG.storage.get("balloonCBT"));
 		   
 			var beginCollideListener:InteractionListener = new InteractionListener(CbEvent.BEGIN, InteractionType.COLLISION, opt1, opt2, beginCollisionHandlerSpikes);
 			
@@ -236,16 +236,31 @@ package
 		
 		private function beginCollisionHandlerSpikes(cb:InteractionCallback):void 
 		{
-			if (cb.int1.userData.act.gameType == "spike") { 
-			  if(cb.int2.userData.act._deleted == false){	
-			   AntG.storage.get("actorForDelete").push(cb.int2.userData.act);
-			   cb.int2.userData.act._deleted = true;
-			  }
+			if (cb.int1.userData.act.gameType == "spike") {
+				
+			  if (cb.int2.userData.act._deleted == false) {	
+				  if (String(cb.int2.userData.act.gameType).substr(0, 4) == "hero") {
+			       AntG.storage.set("gameStatus", "failed");
+				   cb.int2.userData.act._deleted = true;
+				  }
+				  else 
+				  {
+					  AntG.storage.get("actorForDelete").push(cb.int2.userData.act);
+			          cb.int2.userData.act._deleted = true;
+				  } 
+			   }
 			 }
 		    else {
-			  if(cb.int1.userData.act._deleted == false){		
-			    AntG.storage.get("actorForDelete").push(cb.int1.userData.act);
-			    cb.int1.userData.act._deleted = true; 
+			  if (cb.int1.userData.act._deleted == false) {	
+				  if (String(cb.int1.userData.act.gameType).substr(0, 4) == "hero") {
+			       AntG.storage.set("gameStatus", "failed");
+				   cb.int1.userData.act._deleted = true;
+				  }
+				  else 
+				  {
+					  AntG.storage.get("actorForDelete").push(cb.int1.userData.act);
+			          cb.int1.userData.act._deleted = true;
+				  } 
 			   }
 			}
 		}

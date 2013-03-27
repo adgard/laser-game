@@ -34,6 +34,9 @@ package
 			new lev23();
 			new lev24();
 			new lev25();
+			new lev26();
+			new lev27();
+			new lev28();
 			
 			
 			
@@ -63,6 +66,9 @@ package
 			new level22();
 			new level23();
 			new level24();
+			new level25();
+			new level26();
+			new level27();
 			
 						
 		}

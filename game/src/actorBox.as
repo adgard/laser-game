@@ -83,8 +83,11 @@ package
 		public var iceUnderHero:Array = [];
 		public var gameType:String = "none";
 		public var rayType:String = "intake";
+		public var arrowType:String = "none";
 		
 		public var isStatic:Boolean = false;
+		
+		public var Arrow:AntActor ;
 		
 		
 		public var balloonPoints:Array = [new Vec2( -23,-23),new Vec2( -23,23),new Vec2( 23,-23),new Vec2( 23,23)];
@@ -95,9 +98,10 @@ package
 		
 		
 		
-		public function actorBox( img:AntActor,_xy:Vec2, _rotation:Number, _bType:String,_shType:String, _settings:Array, _mType:String, _pointsArray:Array,_type:String,_isSensor:Boolean,_velxy:Vec2,_isMoveable:Boolean,_isMoveSensor:Boolean,_refNumber:int, _refType:String,_gameType:String, _rayType:String,_isStatic:Boolean) 
+		public function actorBox( img:AntActor, _xy:Vec2, _rotation:Number, _bType:String, _shType:String, _settings:Array, _mType:String, _pointsArray:Array, _type:String, _isSensor:Boolean, _velxy:Vec2, _isMoveable:Boolean, _isMoveSensor:Boolean, _refNumber:int, _refType:String, _gameType:String, _rayType:String, _isStatic:Boolean ) 
 		{
 	      //space = space;
+		 //arrowType = _arrowType;
 		  isStatic = _isStatic;
 		  rayType = _rayType;
 		  if (rayType == "reflex")
@@ -149,6 +153,9 @@ package
 		if (isMoveSensor) {
 			 body.cbTypes.add(AntG.storage.get("movesensorCBT"))
 			}
+			
+			
+			
 			
 			
 		
@@ -356,7 +363,9 @@ package
 			for each (var refActor:* in actor(this).refArray ) {
 				switch (refActor._refType) {
 				 case "move":
-					 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);	 
+					 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);
+					 if(refActor.Arrow)
+					  refActor.Arrow.angle = 180/Math.PI*(Vec2(refActor.velxy).angle);
 				 break;
 				 
 				 case "moveMagnet":
@@ -416,6 +425,35 @@ package
 			 }
 			}
 		}
+		
+	public function addArrow(a:AntActor,rType:String):void {
+		Arrow = a;
+		
+		  switch(rType) {
+           case "yellow":
+			   a.gotoAndStop(1);
+		   break;
+		   
+	       case "blue":
+		    a.gotoAndStop(2);
+		   break;
+		   
+	       case "green":
+		    a.gotoAndStop(3);
+		   break;
+		  
+	       case "purple":
+		    a.gotoAndStop(4);
+		   break;
+		   
+		   
+	       default:
+		   break;
+		}
+		//body.userData.graphic.
+        Arrow.angle = 180/Math.PI*(Vec2(body.userData.act.velxy).angle);	   
+		AntActor(body.userData.graphic).add(Arrow);
+	}
 	 public function rotateDynamic():void {
 		 Body(body).applyAngularImpulse(this.velxy.x/4);
 	  }

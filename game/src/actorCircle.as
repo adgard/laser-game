@@ -72,6 +72,7 @@ package
 		public var isStatic:Boolean = false;
 		
 		public var magnetStatInited:Boolean = false;
+		public var Arrow:AntActor ;
 		
 		public function actorCircle( img:AntActor,_xy:Vec2, _rotation:Number, _bType:String,_shType:String, _settings:Array, _mType:String,_type:String,_isSensor:Boolean,_velxy:Vec2,_isMoveable:Boolean,_isMoveSensor:Boolean,_refNumber:int, _refType:String,_gameType:String, _rayType:String,_isStatic:Boolean) 
 		{
@@ -258,11 +259,40 @@ package
 		body.userData.graphic = img;
 		
 		if (shType == "balloon")
-		body.gravMass = - 2*body.gravMass;
+		body.gravMass = - 3*body.gravMass;
 		//body.
 		super(body,refType,refNumber);
 		}
 		
+		
+	  	public function addArrow(a:AntActor,rType:String):void {
+		Arrow = a;
+		
+		  switch(rType) {
+           case "yellow":
+			   a.gotoAndStop(1);
+		   break;
+		   
+	       case "blue":
+		    a.gotoAndStop(2);
+		   break;
+		   
+	       case "green":
+		    a.gotoAndStop(3);
+		   break;
+		  
+	       case "purple":
+		    a.gotoAndStop(4);
+		   break;
+		   
+		   
+	       default:
+		   break;
+		}
+		//body.userData.graphic.
+        Arrow.angle = 180/Math.PI*(Vec2(body.userData.act.velxy).angle);	   
+		AntActor(body.userData.graphic).add(Arrow);
+	}
 		public function checkAngle():void {
 			for each (var refActor:* in actor(this).refArray ) {
 			 if(refActor.isRotating){	
@@ -279,7 +309,8 @@ package
 				 case "move":
 					 
 					 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);
-					 
+	                if(refActor.Arrow)
+					 refActor.Arrow.angle = 180/Math.PI*(Vec2(refActor.velxy).angle);
 				 break;
 				 
 				  case "buttonMove":

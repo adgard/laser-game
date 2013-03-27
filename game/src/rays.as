@@ -1,6 +1,8 @@
 package  
 {
 	import flash.display.MovieClip;
+	import flash.filters.BlurFilter;
+	import flash.filters.GlowFilter;
 	import flash.geom.Vector3D;
 	import nape.dynamics.InteractionFilter;
 	import nape.geom.Vec2;
@@ -19,10 +21,20 @@ package
 	 */
 	public class rays 
 	{
+		private var rayPoint:Vec2 =  new Vec2(0, 0);
+		private var rayPointStat:Vec2 =  new Vec2(28, 0);
+		
+		private var rayInitialPoint:Vec2 =  new Vec2(0,0);
+		private var rayFinalPoint:Vec2 =  new Vec2(0,0);
+		
 		private var filt:InteractionFilter =  new InteractionFilter();
 		private var rayActor:AntActor =  new AntActor();
 		public var rayMC:MovieClip =  new MovieClip();
-		private var rayAnimation:AntAnimation;
+		public var rayMC2:MovieClip =  new MovieClip();
+		public var rayMCEnd:MovieClip =  new MovieClip();
+		
+		
+		private var rayAnimation:AntAnimation  = new AntAnimation();
 		private var rayAngle:Number = 0;
 		private var rayAngleInitial:Number = 0;
 		
@@ -37,6 +49,8 @@ package
 		private var type:String = "none";
 		private var colorRay:uint = 0x000000;
 		private var distance:Number = 0;
+		private var redRay:MovieClip =  new redLazer();
+		
 		
 		
 		
@@ -55,24 +69,26 @@ package
 			 rayActor.tag = 500;
 			 switch(type) {
 				 case "emitter":
-				  colorRay = 0x8CCCDA;
+				  colorRay = 0xF30021;
 				 break;
 				 
 				 case "attraction":
-				  colorRay = 0x000000;
+				  colorRay = 0x00CC00;
 				 break;
 				 
 				 case "repulsion":
-				  colorRay = 0x009900;
+				  colorRay = 0xC10087;
 				 break;
 				 
 				 case "killer":
-				  colorRay = 0xFD807F;
+				  colorRay = 0xF30021;
 				 break;
 				 
 				 case "heroRay":
 				  colorRay = 0x000000;
 				 break;
+				 
+				 
 				 
 				 default:
 				 break;
@@ -80,7 +96,23 @@ package
 				 }
 			// AntState(AntG.antSpace).defGroup.sort("tag");
 			// AntG.antSpace.add(rayActor);
+			 rayMC.filters = new Array(
+               new BlurFilter(1, 1, 1),
+               new GlowFilter(colorRay, 0.8, 4, 4, 3, 2)
+			   
+             );
+			// rayAnimation.makeFromMovieClip(rayMC);
+			// rayAnimation.makeFromMovieClip(rayMC2);
+			 
+			 //AntActor(_body.userData.graphic).addAnimation(rayAnimation);
 			 AntG.antSpace.addChild(rayMC);
+			 AntG.antSpace.addChild(rayMC2);
+			 AntG.antSpace.addChild(rayMCEnd);
+			 
+			
+			 
+			// AntG.antSpace.addChild(redRay);
+			 
 			 rayCurrentPoint = _body.position;
 			 
 			 
@@ -120,16 +152,35 @@ package
 					 
 					  rayCurrentPoint = resultPt;
 					// rayMC = new MovieClip();
+					//redRay.x = rayBody.position.x - rayOffSet.x;
+					//redRay.y = rayBody.position.y - rayOffSet.y;
+					//redRay.rotation = rayBody.rotation;
+					 rayInitialPoint = new Vec2(rayBody.position.x - rayOffSet.x, rayBody.position.y - rayOffSet.y);
+					// rayPoint = rayPointStat;
+					 rayPoint = Vec2.fromPolar(30, rayBody.rotation - Math.PI / 2 + rayAngleInitial)//rayPoint.rotate(rayBody.rotation - Math.PI / 2 + rayAngleInitial);
+					 rayFinalPoint.x = rayInitialPoint.x + rayPoint.x;
+					 rayFinalPoint.y = rayInitialPoint.y + rayPoint.y;
+					 
+					 rayMCEnd.graphics.clear();
+					 rayMCEnd.graphics.lineStyle(4, colorRay, 0.6, false, "normal", "none", "bevel", 0.1);
+					 rayMCEnd.graphics.beginFill(0xFFFFFF,1);
+					 
 					 rayMC.graphics.clear();
-					 rayMC.graphics.lineStyle(4, colorRay, 2, false, "normal", "none", "bevel", 0.1);
-					 rayMC.graphics.moveTo(rayBody.position.x-rayOffSet.x,rayBody.position.y-rayOffSet.y);
+					 rayMC.graphics.lineStyle(4, colorRay, 0.6, false, "normal", "none", "bevel", 0.1);
+					 rayMC.graphics.moveTo(rayFinalPoint.x,rayFinalPoint.y);
 					 rayMC.graphics.lineTo(resultPt.x, resultPt.y);
+					 
+					 rayMC2.graphics.clear();
+					 rayMC2.graphics.lineStyle(2, 0xFFFFFF, 0.6, false, "normal", "none", "bevel", 0.1);
+					 rayMC2.graphics.moveTo(rayFinalPoint.x,rayFinalPoint.y);
+					 rayMC2.graphics.lineTo(resultPt.x, resultPt.y);
 					   //////////////////////// 
 					  if (type == "heroRay") {
 						   if (rayResult != null) {
 							 rayBody.userData.act.canJump = true;
 							 rayBody.userData.act.rayFailedCounter = 0;
 							 rayMC.visible =  false;
+							 
 							 return;
 						   }
 						   else {
@@ -148,16 +199,20 @@ package
 						  
 						 switch(rayResult.shape.body.userData.act.rayType) {
 							 case "destroyed":
-								 if(type == "killer"){
+								 if ((type == "killer") || (type == "emitter")) {
+									 //if(rayResult.shape.body.userData.act.type=="")
 					              AntG.storage.get("actorForDelete").push(rayResult.shape.body.userData.act);
 							     }
-								 else 
+								 else {
 								  applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
+								  rayMCEnd.graphics.drawCircle(resultPt.x,resultPt.y,4)
+								 }
 							   return;
 							   
 							 break;
 							 case "intake":
 					           applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
+							   rayMCEnd.graphics.drawCircle(resultPt.x,resultPt.y,4)
 							   return;
 							  break
 						     
@@ -200,20 +255,25 @@ package
 						   
 					     rayCurrentPoint = resultPt;
 						   rayMC.graphics.lineTo(resultPt.x, resultPt.y);
+						   rayMC2.graphics.lineTo(resultPt.x, resultPt.y);
+						   
 						   
 						   if (rayResult == null)
 						  return;
 						  
 						    switch(rayResult.shape.body.userData.act.rayType) {
 							 case "destroyed":
-								 if(type == "killer"){
+								 if((type == "killer")||(type == "emitter")){
 					              AntG.storage.get("actorForDelete").push(rayResult.shape.body.userData.act);
 							     }
-								 else 
+								 else {
 								  applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
+								  rayMCEnd.graphics.drawCircle(resultPt.x,resultPt.y,4)
+								 }
 							   return;
 							 case "intake":
 					           applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
+							   rayMCEnd.graphics.drawCircle(resultPt.x, resultPt.y, 4);
 							   return;
 							  break
 						     
@@ -234,7 +294,9 @@ package
 				    }
 		
 		}
-		
+		private function drawlines(len, w, fColor, gColor, ptr):void {
+	
+			}
 		private function applyImpulses(_type:String,_body:Body,_pointImpulse:Vec2,_impulse:Vec2):void 
 		{
 			var m:Number = 0 ;
@@ -260,7 +322,14 @@ package
 		public function clear():void
 		{
 	     rayMC.graphics.clear();
+		 rayMC2.graphics.clear();
+		 rayMCEnd.graphics.clear();
+		 
+		 
 		 AntG.antSpace.addChild(rayMC);
+		 AntG.antSpace.addChild(rayMC2);
+		 AntG.antSpace.addChild(rayMCEnd);
+		 
 		}
 		
 		private function getAngle(vector3D:Vector3D, vector3D1:Vector3D):Number

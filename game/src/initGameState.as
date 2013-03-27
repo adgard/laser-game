@@ -57,7 +57,7 @@ package
 			
 		
 			loader.addClips(mcForRasterization); 
-			loader.addClips(new <Class>[clockOrange,leverImg,jointForMouse]);
+			loader.addClips(new <Class>[clockOrange,leverImg,jointForMouse,arrows]);
 			loader.addClips(new <Class>[node1, node2, balloon1,mc_node]); 
 			
 			// Добавляем обработчик для завершения процесса растеризации.
@@ -84,7 +84,7 @@ package
 		parseLevel(gc);
 		parseLevel(cf); 
 		 	
-		 for (var i:int = 1; i < 26; i++ ){
+		 for (var i:int = 1; i < 29; i++ ){
 		 	var levelName:String = String("lev" + i);
 			var levelBG:String = String("level" + (i-1));
 			
@@ -93,10 +93,10 @@ package
 			
 			
 			var currentLevel:MovieClip =  (new refLevel() as MovieClip); //тащим мувиклип с левелом из библиотеки
-            var currentBG:MovieClip =  (new refLevelBG() as MovieClip); //тащим мувиклип с левелом из библиотеки
+           // var currentBG:MovieClip =  (new refLevelBG() as MovieClip); //тащим мувиклип с левелом из библиотеки
             
 			parseLevel(currentLevel);
-			parseLevel(currentBG);
+		//	parseLevel(currentBG);
 			
 		 }
 		 
