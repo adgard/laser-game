@@ -5,6 +5,7 @@ package
 	import nape.constraint.WeldJoint;
 	import nape.dynamics.CollisionArbiter;
 	import nape.phys.*
+	import nape.geom.Vec2;
 	
 	import nape.callbacks.InteractionCallback;
 	import nape.callbacks.InteractionListener;
@@ -344,11 +345,26 @@ package
 		 //	trace("begin move sensor");	
 			if (cb.int1.userData.act.isMoveable) {
 			   Body(cb.int1).velocity.setxy(Body(cb.int2).userData.act.velxy.x , Body(cb.int2).userData.act.velxy.y);
+			   if(Body(cb.int2).userData.act.refType=="move"){
+			    Body(cb.int1).userData.act.velxy.x = Body(cb.int2).userData.act.velxy.x;
+			    Body(cb.int1).userData.act.velxy.y = Body(cb.int2).userData.act.velxy.y;
+			   }
+			   if((Body(cb.int1).userData.act.Arrow)&&!((Body(cb.int1).userData.act.velxy.x==0)&&(Body(cb.int1).userData.act.velxy.y==0)))
+					  Body(cb.int1).userData.act.Arrow.angle = 180/Math.PI*(Vec2(Body(cb.int1).userData.act.velxy)).angle;
+			   
 			   //Body(cb.int1).userData.act.velxy = Body(cb.int1).velocity;
 			 }
 		 else {
 			  // AntActor(cb.int2.userData.graphic).gotoAndStop(2);
-			    Body(cb.int2).velocity.setxy(Body(cb.int1).userData.act.velxy.x ,Body(cb.int1).userData.act.velxy.y);
+			    Body(cb.int2).velocity.setxy(Body(cb.int1).userData.act.velxy.x , Body(cb.int1).userData.act.velxy.y);
+				if(Body(cb.int2).userData.act.refType=="move"){
+				Body(cb.int2).userData.act.velxy.x = Body(cb.int1).userData.act.velxy.x;
+			    Body(cb.int2).userData.act.velxy.y = Body(cb.int1).userData.act.velxy.y;
+				}
+			   if((Body(cb.int2).userData.act.Arrow)&&!((Body(cb.int2).userData.act.velxy.x==0)&&(Body(cb.int2).userData.act.velxy.y==0)))
+					  Body(cb.int2).userData.act.Arrow.angle = 180/Math.PI*(Vec2(Body(cb.int2).userData.act.velxy)).angle;
+			   
+			   
 	           // Body(cb.int2).userData.act.velxy = Body(cb.int2).velocity;	  
 		 }	 
 		}

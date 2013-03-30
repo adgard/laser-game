@@ -35,7 +35,7 @@ package
 		public var ropeComp:actor;
 		public var rotateAngle:Number = 0 ;
 		public var initialAngle:Number = -1 ;
-		
+		public var finalStop:Boolean =  false;
 		
 		public var balloonEnabled:Boolean =  false;
 		public var xy:Vec2 = new Vec2(0, 0);
@@ -364,7 +364,7 @@ package
 				switch (refActor._refType) {
 				 case "move":
 					 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);
-					 if(refActor.Arrow)
+					 if((refActor.Arrow)&&!((refActor.velxy.x==0)&&(refActor.velxy.y==0)))
 					  refActor.Arrow.angle = 180/Math.PI*(Vec2(refActor.velxy).angle);
 				 break;
 				 

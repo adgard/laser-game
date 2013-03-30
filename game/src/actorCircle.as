@@ -73,6 +73,7 @@ package
 		
 		public var magnetStatInited:Boolean = false;
 		public var Arrow:AntActor ;
+		public var finalStop:Boolean =  false;
 		
 		public function actorCircle( img:AntActor,_xy:Vec2, _rotation:Number, _bType:String,_shType:String, _settings:Array, _mType:String,_type:String,_isSensor:Boolean,_velxy:Vec2,_isMoveable:Boolean,_isMoveSensor:Boolean,_refNumber:int, _refType:String,_gameType:String, _rayType:String,_isStatic:Boolean) 
 		{
@@ -309,7 +310,7 @@ package
 				 case "move":
 					 
 					 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);
-	                if(refActor.Arrow)
+	                if((refActor.Arrow)&&!((refActor.velxy.x==0)&&(refActor.velxy.y==0)))
 					 refActor.Arrow.angle = 180/Math.PI*(Vec2(refActor.velxy).angle);
 				 break;
 				 

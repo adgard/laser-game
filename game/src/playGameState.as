@@ -827,7 +827,14 @@ package
 			  	r.update();
 			
 	} //end
+	
+	private function hideRayCast():void
+	   {
 		
+			for each(var r:rays in rayCastArray) 
+			  	r.hide();
+			
+	   }
 		private function addJumpRays(b:Body):void 
 		{
 			var r1:rays;
@@ -871,6 +878,7 @@ package
 		private function stopEngines():void 
 		{
 			run = false;
+			hideRayCast();
 		}
 		
 		private function createExplosion(bb:Body):void 

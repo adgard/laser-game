@@ -73,9 +73,12 @@ package
 		 var mm:MovieClip =  new main_menu();
 		 var lm:MovieClip = new level_menu();
 		 var pm:MovieClip = new play_menu ();
-		 var gc:MovieClip = new gCompleted ();
-		 var lc:MovieClip = new lCompleted ();
-		 var cf:MovieClip = new creditForm ();
+		 var gc:MovieClip = new gCompleted();
+		 var lc:MovieClip = new lCompleted();
+		 var cf:MovieClip = new creditForm();
+		 var ff:MovieClip = new level_failed();
+		 
+		 
 		 
 		parseLevel(mm);
 		parseLevel(lm);
@@ -83,6 +86,8 @@ package
 		parseLevel(lc);
 		parseLevel(gc);
 		parseLevel(cf); 
+		parseLevel(ff); 
+		
 		 	
 		 for (var i:int = 1; i < 29; i++ ){
 		 	var levelName:String = String("lev" + i);
@@ -110,6 +115,7 @@ package
 		gc = null;
 		lc = null;
 		cf = null;
+		ff = null;
 		
 		}
 		

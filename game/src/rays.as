@@ -49,8 +49,6 @@ package
 		private var type:String = "none";
 		private var colorRay:uint = 0x000000;
 		private var distance:Number = 0;
-		private var redRay:MovieClip =  new redLazer();
-		
 		
 		
 		
@@ -84,7 +82,11 @@ package
 				  colorRay = 0xF30021;
 				 break;
 				 
-				 case "heroRay":
+			      case "heroRay":
+				  rayMC.visible = false;
+				  rayMC2.visible = false;
+				  rayMCEnd.visible = false;
+				  
 				  colorRay = 0x000000;
 				 break;
 				 
@@ -294,22 +296,26 @@ package
 				    }
 		
 		}
-		private function drawlines(len, w, fColor, gColor, ptr):void {
-	
+		public function hide():void {
+	          rayMCEnd.visible = false;
+			  rayMC.visible = false;
+			  rayMC2.visible = false;
 			}
 		private function applyImpulses(_type:String,_body:Body,_pointImpulse:Vec2,_impulse:Vec2):void 
 		{
 			var m:Number = 0 ;
             m = _body.mass;
+			if (_body.userData.act.refType == "lever")
+			 m *= 2;
 			//trace(m);
 			               switch(_type) {
                                case "repulsion":
-								   _body.applyImpulse(_impulse.mul(m * 8),_pointImpulse);
+								   _body.applyImpulse(_impulse.mul(m * 10),_pointImpulse);
 								   
 							   break;	
 							   
 							   case "attraction":
-								   _body.applyImpulse(_impulse.mul(m * 8).rotate(Math.PI),_pointImpulse);  
+								   _body.applyImpulse(_impulse.mul(m * 10).rotate(Math.PI),_pointImpulse);  
 							   break;	
 							   case "steel":
 							   break;	 

@@ -44,7 +44,7 @@
 		//private var comicsMovie:MovieClip = new comics();
 		//public var api:API;
 		//public var loginned:Boolean = false;
-		public var playButton:SimpleButton = new preloaderPlay();
+		public var playButton:SimpleButton = new preloader_play();
 		
 		public function Preloader() {
 			
