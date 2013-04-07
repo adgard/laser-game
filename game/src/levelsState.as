@@ -43,13 +43,17 @@ package
 		private function showLevelIcons(m:MovieClip):void
 		{
 			
-			
+			var cookies:AntCookie = AntG.storage.get("cookie");
+			var arrLevels:* = (cookies.read("levels"));
+			var iLevels:int = 0 ;
 			for (var i:int = 0; i < m.numChildren; i++)
              {
               if (m.getChildAt(i) is MovieClip)
               {
                 var pObject:* = m.getChildAt(i);
 				var strName:String = String(pObject.name).substring(0, 6);
+				var strName2:String = String(pObject.name).substring(0, 1);
+				
 			
 				switch (strName) {
 					 case "button":
@@ -77,11 +81,44 @@ package
 					 
 					 
 					 default:
-					  mc = new AntActor();
-			          mc.addAnimationFromCache(getQualifiedClassName(pObject));
-			          add(mc);
-					  mc.x = pObject.x;
-					  mc.y = pObject.y;
+					 
+					  
+					  if ((strName2 == "i") && (String(pObject.name).length < 5)) {
+						  
+						  btn = new AntButton();
+			            btn.addAnimationFromCache(getQualifiedClassName(pObject));
+			            btn.x = pObject.x;
+			            btn.y = pObject.y;
+					    btn.toggle = true;
+			            add(btn); 
+						  
+						  if(String(pObject.name).length==2)
+					   	   iLevels = int(String(pObject.name).substring(1, 2));
+						  else 
+						   iLevels = int(String(pObject.name).substring(1, 3));	
+						   
+						   if(arrLevels[iLevels-1]==1){
+					        btn.selected = true;
+						    AntButton(btn).eventClick.add(goToPlayMenu);
+						   }
+							
+					       if(arrLevels[iLevels-1]==2){
+					        btn.selected = true;
+							AntButton(btn).eventClick.add(goToPlayMenu);
+						   }
+						   if(arrLevels[iLevels-1]==0)
+					        btn.selected = false;
+								
+					  }
+					  
+					  else {
+						     mc = new AntActor();
+			                 mc.addAnimationFromCache(getQualifiedClassName(pObject));
+			                 add(mc);
+					         mc.x = pObject.x;
+					         mc.y = pObject.y;
+						   }
+					  
 					 break;
 					}
 				
@@ -94,10 +131,10 @@ package
 		private function goToPlayMenu(aButton:AntButton):void 
 		{
 		    
-			if(String(aButton.currentAnimation).length<6)
-			 AntG.storage.set("currentLevel", int((String(aButton.currentAnimation).substring(4, 5))));
+			if(String(aButton.currentAnimation).length==5)
+			 AntG.storage.set("currentLevel", int((String(aButton.currentAnimation).substring(4, 5)))-1);
 			else 
-			  AntG.storage.set("currentLevel", int((String(aButton.currentAnimation).substring(4, 6))));
+			  AntG.storage.set("currentLevel", int((String(aButton.currentAnimation).substring(4, 6)))-1);
 			
 			aButton.eventClick.remove(goToPlayMenu);
 			AntG.anthill.switchState(new playGameState());	

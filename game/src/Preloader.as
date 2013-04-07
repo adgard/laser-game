@@ -30,13 +30,13 @@
           // public var bg:Class;
 		 // private  var atLogo:*; 
 		
-		
-		
+		private var heroCurrent:int = 0;
+		private var nn:int = 0;
 		private var preloader		:Shape;
 		private var progressText	:TextField;
 		private var infoText		:TextField;
-		
-		private var clock:clockOrange = new clockOrange;
+		private var heroConstant:Number = 100 / 33  ;
+		private var clock:PreloaderMain = new PreloaderMain;
 		//private var clockArrow:arr2;
 		private var atLogo:*;
 		private var minuteplay2:*;
@@ -44,30 +44,44 @@
 		//private var comicsMovie:MovieClip = new comics();
 		//public var api:API;
 		//public var loginned:Boolean = false;
+		public var heroArray:Array = [];
+		public var shuffleArray:Array = [];
+		
 		public var playButton:SimpleButton = new preloader_play();
+		public var heroCounter:int = 33;
 		
 		public function Preloader() {
 			
-		//	stage.align = StageAlign.TOP_LEFT;
-			//stage.scaleMode = StageScaleMode.NO_SCALE;
-            //api = new API('000015', 'Wyb32aou', 'http://twotowersgames.com/api'); 
+		
 			
 			addEventListener(Event.ENTER_FRAME, checkFrame);
 			loaderInfo.addEventListener(ProgressEvent.PROGRESS, progress);
 			loaderInfo.addEventListener(IOErrorEvent.IO_ERROR, ioError);
 			// show loader
 			
-		  
-		   
-			
-			//minuteplay2 = minuteplay(SimpleButton(clock.getChildByName("minute")));
-			//minuteplay2.addEventListener(MouseEvent.CLICK, logoListener3);
-			
-			//clock.getChildByName("ttLogoPreloader").addEventListener(MouseEvent.CLICK, logoListener2);;
+		 
 			
 			clock.x = 0;
 			clock.y = 0;
 			clock.visible = true;
+			var hero:MovieClip;
+			
+			
+			for (var j:int = 0; j < 33; j++ ) {
+				shuffleArray.push(j + 1);
+				hero = MovieClip(clock.getChildByName("h" + (j+1)))
+				if ( hero != null) {
+					 hero.gotoAndStop(int(Math.random() * 5));
+					}
+			}
+			
+			 for (var i:int=0; i<33; i++) {
+               var index:int = int(Math.random() * shuffleArray.length)  ;
+                heroArray.push(shuffleArray[index]);
+                shuffleArray.splice(index, 1);
+             }
+           
+		
 			addChild(clock);
 			
 		
@@ -81,7 +95,7 @@
 			//addChild(preloader);
 			
 			progressText = new TextField();
-			var progressTextFormat:TextFormat = new TextFormat("Comic Sans MS", 24, 0xFFFFFF, true);
+			var progressTextFormat:TextFormat = new TextFormat("Comic Sans MS", 24, 0x000000, true);
 			progressTextFormat.align = TextFormatAlign.CENTER;
 			progressText.defaultTextFormat = progressTextFormat;
 			addChild(progressText);
@@ -121,8 +135,8 @@
 				preloader.y = stage.stageHeight/2;
 			}
 			if (progressText) {
-				progressText.x = 320;//(stage.stageWidth - progressText.width)/2 ;
-				progressText.y = (stage.stageHeight)/2+50;
+				progressText.x = 260;//(stage.stageWidth - progressText.width)/2 ;
+				progressText.y = (stage.stageHeight)/2+150;
 			//	infoText.x = (stage.stageWidth - infoText.width)/2 ;
 				//infoText.y = (stage.stageHeight)/2  - 60;
 			}
@@ -130,19 +144,24 @@
 		
 		private function progress(e:ProgressEvent):void {
 			// update loader
-			 
-			
+			var heroNumber:int = 0; 
+			var heroToDelete:*;
 			if (progressText) {
 				trace("ebitetotal" + e.bytesTotal);
 				progressText.text = Math.round(e.bytesLoaded / e.bytesTotal * 100).toString() + " %";
 				//clockArrow.rotation = Math.round(e.bytesLoaded / e.bytesTotal * 100) * 3.6;
 				trace(progressText.text);
-			}
-			//hed.x = e.bytesLoaded / e.bytesTotal * 170 * 6;
-		
-			//hed.rotation = (hed.x-32)*360/200;
+	        }
+			hideHero(Math.round(e.bytesLoaded / e.bytesTotal * 100)/3);
 		}
-		
+		private function hideHero(heroNumber:int):void {
+			var cNumber:int = 0;
+			for (var i:int = 0; i < heroNumber; i++  )
+			{
+				cNumber =  heroArray[i];
+				clock.getChildByName("h" + cNumber).visible = false;;
+			}
+		}
 		private function checkFrame(e:Event):void {
 		//	preloader.rotation += 5;
 			

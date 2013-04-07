@@ -16,7 +16,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'29.03.2013'</value>
+      <value>'06.04.2013'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -44,7 +44,7 @@
       <path-element>D:\antFramework\laser-game\game\lib\ui3.swc</path-element>
       <path-element>D:\antFramework\laser-game\game\lib\levelsBG.swc</path-element>
       <path-element>D:\antFramework\laser-game\game\lib\game.swc</path-element>
-      <path-element>D:\antFramework\laser-game\game\lib\nape-dev.swc</path-element>
+      <path-element>D:\antFramework\laser-game\game\lib\nape-release.swc</path-element>
     </library-path>
   </compiler>
   <file-specs>

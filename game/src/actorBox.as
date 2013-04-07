@@ -24,6 +24,8 @@ package
 	public class actorBox extends actor
 	{
 		public var LeverType:int =  0;
+		public var initAngle:Number =  0;
+		
 		public var magnetEnabled:Boolean =  false;
 		
 	    public var filt:InteractionFilter = new InteractionFilter();
@@ -95,18 +97,16 @@ package
 		
 		
 		
-		
-		
-		
 		public function actorBox( img:AntActor, _xy:Vec2, _rotation:Number, _bType:String, _shType:String, _settings:Array, _mType:String, _pointsArray:Array, _type:String, _isSensor:Boolean, _velxy:Vec2, _isMoveable:Boolean, _isMoveSensor:Boolean, _refNumber:int, _refType:String, _gameType:String, _rayType:String, _isStatic:Boolean ) 
 		{
 	      //space = space;
 		 //arrowType = _arrowType;
+		 initAngle = _rotation;
 		  isStatic = _isStatic;
 		  rayType = _rayType;
 		  if (rayType == "reflex")
 		   trace(rayType);
-		  
+		 
 		  gameType = _gameType;
 		  refType = _refType;
 		  refNumber = _refNumber;
@@ -249,20 +249,41 @@ package
 			body.cbTypes.add(AntG.storage.get("buttonCBT"));
 		 break;
 		
-		 case "hero1":
-		 	body.cbTypes.add(AntG.storage.get("dynamicCBT"));
-			body.cbTypes.add(AntG.storage.get("hero1CBT"));		
+	      case "hero1":
+		   body.cbTypes.add(AntG.storage.get("hero1CBT"));			
+		   body.cbTypes.add(AntG.storage.get("dynamicCBT"));	
+		    img.gotoAndPlay(2);
+			img.addAnimationFromCache("hero1_a1");
+			
+			img.addAnimationFromCache("hero1_a2");
+			img.switchAnimation("mc_hero1");
+			
 		 break;
 		 
 		 case "hero2":
 		 	body.cbTypes.add(AntG.storage.get("dynamicCBT"));
-			body.cbTypes.add(AntG.storage.get("hero2CBT"));		
+			body.cbTypes.add(AntG.storage.get("hero2CBT"));	
+			
+			img.gotoAndPlay(2);
+			img.addAnimationFromCache("hero2_a1");
+			
+			img.addAnimationFromCache("hero2_a2");
+			img.switchAnimation("mc_hero2");
 		 break;
 		 
 		  case "hero4":
 		 	body.cbTypes.add(AntG.storage.get("dynamicCBT"));
 			body.cbTypes.add(AntG.storage.get("hero4CBT"));	
 			circle.sensorEnabled = true;
+			
+			img.gotoAndPlay(2);
+			img.addAnimationFromCache("hero4_a0");
+			
+			img.addAnimationFromCache("hero4_a2");
+			img.addAnimationFromCache("hero4_a2_2");
+			
+			img.switchAnimation("mc_hero4");
+			
 		 break;
 		 
 		 case "balloon":
@@ -272,6 +293,10 @@ package
 		 case "hero3":
 		 	body.cbTypes.add(AntG.storage.get("dynamicCBT"));
 			body.cbTypes.add(AntG.storage.get("hero3CBT"));		
+			img.gotoAndPlay(2);
+			
+			img.addAnimationFromCache("hero3_a2");
+			img.switchAnimation("mc_hero3");
 		 break;
 		 
 		 case "magnet":
@@ -353,6 +378,7 @@ package
 		if (isStatic) {
              img.visible = false;
 			}
+			img.angle = (rotation * 180 / Math.PI) % 360 ;
 		body.userData.graphic = img;
 		//body.
 		super(body,refType,refNumber);
@@ -365,7 +391,7 @@ package
 				 case "move":
 					 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);
 					 if((refActor.Arrow)&&!((refActor.velxy.x==0)&&(refActor.velxy.y==0)))
-					  refActor.Arrow.angle = 180/Math.PI*(Vec2(refActor.velxy).angle);
+					  refActor.Arrow.angle = 180/Math.PI*(Vec2(refActor.velxy).angle) - Body(refActor._body).rotation * 180/Math.PI ;
 				 break;
 				 
 				 case "moveMagnet":
@@ -451,8 +477,10 @@ package
 		   break;
 		}
 		//body.userData.graphic.
-        Arrow.angle = 180/Math.PI*(Vec2(body.userData.act.velxy).angle);	   
+        Arrow.angle = 180/Math.PI*(Vec2(body.userData.act.velxy).angle)- body.rotation * 180/Math.PI;	   
 		AntActor(body.userData.graphic).add(Arrow);
+		
+		
 	}
 	 public function rotateDynamic():void {
 		 Body(body).applyAngularImpulse(this.velxy.x/4);
@@ -475,10 +503,10 @@ package
 					 refActor.velxy.y = refActor._body.velocity.y;
 					 
 					 refActor._body.velocity.setxy(0, 0);
-					  if (refActor.magnetJointInited) {
+					  if (refActor.magnetJoint) {
 						   AntG.space.constraints.remove(refActor.magnetJoint);
 						   refActor.magnetJoint = null;
-						   refActor.magnetJointInited = false;
+						   refActor.magnetJointInited = true;
 						  }	 
 				 break;
 				 

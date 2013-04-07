@@ -26,6 +26,17 @@ package
 	
 	public class playGameState extends AntState
 	{
+		private var ice1:AntActor = new AntActor();
+		private var ice2:AntActor = new AntActor();
+		private var ice3:AntActor = new AntActor();
+		private var effectArray:Array = [];
+		private var effectForDelete:Array = [];
+		
+		private var gameStatusCounter:int = 0;
+		private var currentGameStatus:String = "none";
+		
+		
+		
 		private var currentRay:rays;
 		private var rayCastArray:Array = [];
 		private var raysForDelete:Array = [];
@@ -70,20 +81,24 @@ package
 		private var mouseJointBody:actorBox = null;
 		private var redactorEnabled:Boolean = false;
 		
+		
 		override public function create():void
 		{
-		  levelNumber = AntG.storage.get("currentLevel");
-			var levelBG:String = String("level" + (levelNumber-1));
+		    levelNumber = AntG.storage.get("levelNumbers")[(AntG.storage.get("currentLevel"))];
+			
+			//var levelBG:String = String("level" + (levelNumber-1));
 			var levelName:String = String("lev" + levelNumber);
 			var refLevel:Class = getDefinitionByName(levelName) as Class;
-			var refBG:Class = getDefinitionByName(levelBG) as Class;
+			//var refBG:Class = getDefinitionByName(levelBG) as Class;
 			
 			var currentLevel:MovieClip =  (new refLevel() as MovieClip); //тащим мувиклип с левелом из библиотеки
-			var currentBG:MovieClip =  (new refBG() as MovieClip); //тащим мувиклип с левелом из библиотеки
+			//var currentBG:MovieClip =  (new refBG() as MovieClip); //тащим мувиклип с левелом из библиотеки
 			
 			AntG.storage.set("actorForDelete", actorForDelete);
+			AntG.storage.set("effectForDelete", effectForDelete);
 			AntG.storage.set("rays", rayCastArray);
 			AntG.storage.set("gameStatus", "none");
+			AntG.storage.set("effects", effectArray);
 			
 			
 			
@@ -232,7 +247,36 @@ package
 				  currentAntActor.tag = defGroup.numChildren;
 				  add(currentAntActor);
 				}	 
-				 
+				
+				
+				
+			for each(var a:Array in mcComplexForPhysics) {
+				 c = a[0];
+				  //currentAnimation.destroy();
+				  currentAntActor = new AntActor();
+				  currentAntActor.x = c.x;
+				  currentAntActor.y = c.y;
+				  currentAntActor.angle = c.rotation * Math.PI / 180;
+				  currentAntActor.addAnimationFromCache(getQualifiedClassName(MovieClip(c)));
+				  currentAntActor.tag = defGroup.numChildren;
+				  add(currentAntActor);
+				 switch (c.name2) {
+					
+					  
+				  case "complex":
+					 // getPointForComplex(c);
+					   currentActor = new actorBox(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,a[1],c.name2,false,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType,c.isStatic);
+					  _space.bodies.add(currentActor._body);
+					   actorArray.push(currentActor);
+					  break;
+					  
+					  
+				      default:
+					   trace('nothing for physics');
+					  break;
+					 }
+				  //currentActor = new 
+				}	
 				 
 			for each(c in mcForPhysics) {
 				 // currentAnimation.destroy();
@@ -260,11 +304,29 @@ package
 				             currentAntActor.y = comArr.y;
 				             currentAntActor.angle = comArr.rotation * Math.PI / 180;
 				             currentAntActor.addAnimationFromCache("arrows");
-							  actorBox(currentActor).addArrow(currentAntActor,c.arrowType);
+							  actorBox(currentActor).addArrow(currentAntActor, c.arrowType);
+							
 						  }
 						 }
 					    
 					   actorArray.push(currentActor);
+					   if (c.typeElement == "emitter")
+					    addEmiterRay(currentActor);
+					   if (c.typeElement == "ice")
+					    {
+							if (currentAntActor.width < 60)
+							 ice1.addAnimationFromCache("iceBoom11");
+							
+							if ((currentAntActor.width > 60)&&(currentAntActor.width<100))
+							 ice2.addAnimationFromCache("iceBoom12");
+							
+							if (currentAntActor.width > 100)
+							 ice3.addAnimationFromCache("iceBoom14");
+							 
+							 
+						}
+							
+						
 					 }
 					 else 
 					  createLever(c);
@@ -285,35 +347,21 @@ package
 				  //currentActor = new 
 				}
 				
-			for each(var a:Array in mcComplexForPhysics) {
-				 c = a[0];
-				  //currentAnimation.destroy();
-				  currentAntActor = new AntActor();
-				  currentAntActor.x = c.x;
-				  currentAntActor.y = c.y;
-				  currentAntActor.angle = c.rotation * Math.PI / 180;
-				  currentAntActor.addAnimationFromCache(getQualifiedClassName(MovieClip(c)));
-				  currentAntActor.tag = defGroup.numChildren;
-				  add(currentAntActor);
-				 switch (c.name2) {
-					
-					  
-				  case "complex":
-					  getPointForComplex(c);
-					   currentActor = new actorBox(currentAntActor, new Vec2(c.x, c.y), c.rotation * Math.PI / 180, c.bodyType, c.shapeType, [c.density,c.dynamicFriction,c.elasticity,c.rollingFriction,c.staticFriction],c.materialType,a[1],c.name2,false,new Vec2(c.velx,c.vely),c.isMoveable,c.isMoveableSensor,c.refNumber,c.refType,c.typeElement,c.rayType,c.isStatic);
-					  _space.bodies.add(currentActor._body);
-					   actorArray.push(currentActor);
-					  break;
-					  
-					  
-				      default:
-					   trace('nothing for physics');
-					  break;
-					 }
-				  //currentActor = new 
-				}
+			
 				
 
+		}
+		
+		private function addEmiterRay(a:actor):void 
+		{
+			if(actorBox(a).rayEnabled == false){
+					   currentRay =  new rays(a._body, new Vec2(0,0), 0,"emitter",640);
+				       rayCastArray.push(currentRay);
+					   actorBox(a).rayEnabled = true;
+					  actorBox(a).rayArray.push(currentRay);
+					   AntActor(a._body.userData.graphic).gotoAndStop(2);
+					  }
+				
 		}
 		
 		private function createLever(c:componentClass):void 
@@ -361,18 +409,18 @@ package
 		private function getPointForComplex(com:MovieClip):Array
 		{
 			var m:*;
-			
+			var i:int = 0;
 			 var  pointArrayForComplex:Array  = [];
-			for (var i:int = 0; i < com.numChildren; i++)
-             {
-				 m = com.getChildByName("i"+i);
-              if (com.getChildAt(i) is MovieClip)
-              {
-                var pObject:*=com.getChildAt(i);
-                pointArrayForComplex.push(new Vec2(pObject.x,pObject.y));
-                //trace(pObject);
-              }
-             }
+			 m = com.getChildByName("i" + i);
+			while (m is mc_points)
+			{
+			 	
+                pointArrayForComplex.push(new Vec2(m.x, m.y));
+				i++;
+				m = com.getChildByName("i" + i);
+				
+			}
+           
 			 
 			 return pointArrayForComplex;
 		}
@@ -486,9 +534,9 @@ package
 		private function goToNext(aButton:AntButton):void 
 		{
 			aButton.eventClick.remove(goToNext);
-			AntG.storage.set("currentLevel",levelNumber+1);
+			AntG.storage.set("currentLevel",AntG.storage.get("currentLevel")+1);
 			AntG.anthill.switchState(new playGameState());
-			
+			AntG.sounds.play("button");
 			lcompl.kill();
 			gcompl.kill();
 			
@@ -504,11 +552,11 @@ package
 			
 			var buttonNodePoint:Vec2;
 			for each (var a:* in actorArray) {
-				 if (a._type == "button") {
+				 if ((a._type == "button")) {
 					
 					 bList = _space.bodiesUnderPoint(a._body.position);
 					 if(bList.length > 1){
-					   if(bList.at(0).userData.act.type =="button" ){
+					   if((bList.at(0).userData.act._type =="button" )&&(bList.at(0).userData.act.isMoveable==true)){
 						 a.buttonNode = bList.at(1).userData.act;
 						 bList.at(1).userData.act.buttonNodePoint =  bList.at(1).worldPointToLocal(a._body.position);
 					   } 
@@ -520,7 +568,7 @@ package
 					 }
 					 currentNodeRefference = a;
 			          for each (var b:actor in actorArray) {
-					   if ((b._refType!="none")&&(b._refNumber == currentNodeRefference._refNumber)&&(b._refType!="button")) {
+					   if ((b._refType!="none")&&(b._refNumber == currentNodeRefference._refNumber)&&(b._refType!="button")&&(b._refType!="buttonClick")&&(b._refType!="buttonMove")) {
 						    currentNodeRefference.refArray.push(b);
 						    b.refArray.push(currentNodeRefference);
 						   }
@@ -586,6 +634,10 @@ package
 						  //createBalloon(new Vec2(AntG.mouse.x, AntG.mouse.y), bL.at(0));
 						  //Body(bL.at(0)).userData.act.balloonEnabled = true;
 						   bL.at(0).gravMass = -bL.at(0).gravMass; 
+						   if(bL.at(0).gravMass>0)
+						    bL.at(0).userData.graphic.addAnimationFromCache("mc_hero1");
+						   else
+						    bL.at(0).userData.graphic.addAnimationFromCache("hero1_a1");
 						  }
 						 }
 						  else{ 
@@ -605,11 +657,16 @@ package
 						 addJumpRays(Body(bL.at(0)));
 						 
 						}
-						if(Body(bL.at(0)).userData.act.canJump)
-					     heroJump(bL.at(0));
-						else 
+						if(Body(bL.at(0)).userData.act.canJump){
+					        
+						    bL.at(0).userData.graphic.addAnimationFromCache("hero2_a1");
+							heroJump(bL.at(0));
+						}
+						else{ 
 						 trace("in flying");
-						 
+						// bL.at(0).userData.graphic.addAnimationFromCache("mc_hero2"); 
+						}
+						
 					 }	
 					 else{ 
 					   actorForDelete.push(bL.at(0).userData.act.ropeComp);
@@ -633,6 +690,16 @@ package
 						  } 
 					     
 						  createExplosion(bL.at(0));
+						  
+						  var boomBoom:AntActor = new AntActor();
+						  boomBoom.addAnimationFromCache("boom4");	 
+				          boomBoom.x = bL.at(0).position.x;
+				          boomBoom.y = bL.at(0).position.y;
+				          boomBoom.angle = bL.at(0).rotation;
+				          boomBoom.gotoAndPlay(2);
+				          add(boomBoom);
+				          effectArray.push(new effects(boomBoom, bL.at(0).position, bL.at(0).rotation, "boom"));
+				   
 						  actorForDelete.push(bL.at(0).userData.act);
 						 
 						 
@@ -651,18 +718,20 @@ package
 					
 			 case "button": 
 				 if(bL.at(0).userData.act.refType == "buttonClick"){
-				  if (bL.at(0).userData.act.bClickEnabled) {
-					 bL.at(0).userData.act.bClickEnabled = false;
-					 AntActor(bL.at(0).userData.graphic).gotoAndStop(1);
+				  if ((bL.at(0).userData.act.bClickEnabled)&&(bL.at(0).userData.act.isMoveable)) {
+					// bL.at(0).userData.act.bClickEnabled = false;
+					 AntActor(bL.at(0).userData.graphic).gotoAndStop(3);
 					 bL.at(0).userData.act.disableRefference();
-					 
-					}   
+					}
+				 
 				else {
+					  if(bL.at(0).userData.act.bClickEnabled==false){
 					   bL.at(0).userData.act.bClickEnabled = true;
 					   AntActor(bL.at(0).userData.graphic).gotoAndStop(2);
 					   bL.at(0).userData.act.enableRefference();
 					 }
 				 }
+				}
 				 break; 
 				 
 				  case "attraction":
@@ -687,24 +756,7 @@ package
 				 break;
 				 
 				 case "emitter":
-					  if(bL.at(0).userData.act.rayEnabled == false){
-					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"emitter",640);
-				       rayCastArray.push(currentRay);
-					   bL.at(0).userData.act.rayEnabled = true;
-					   bL.at(0).userData.act.rayArray.push(currentRay);
-					   AntActor(bL.at(0).userData.graphic).gotoAndStop(2);
-					  }
-					  else 
-					    {
-						 bL.at(0).userData.act.rayEnabled = false;	
-						 AntActor(bL.at(0).userData.graphic).gotoAndStop(1);
-						 for  each (var r:rays in bL.at(0).userData.act.rayArray){
-						  raysForDelete.push(r);
-						  r.clear();
-						 }
-						 
-						 bL.at(0).userData.act.rayArray = [];
-						}
+					  
 				 break;
 				 
 				  case "killer":
@@ -776,18 +828,109 @@ package
 								  
 							    case "button":
 								 if(bL.at(i).userData.act.refType == "buttonClick"){
-				                  if (bL.at(i).userData.act.bClickEnabled) {
-					               bL.at(i).userData.act.bClickEnabled = false;
-					               AntActor(bL.at(i).userData.graphic).gotoAndStop(1);
+				                  if ((bL.at(i).userData.act.bClickEnabled)&&(bL.at(i).userData.act.isMoveable)) {
+					              // bL.at(i).userData.act.bClickEnabled = false;
+					               AntActor(bL.at(i).userData.graphic).gotoAndStop(3);
 					               bL.at(i).userData.act.disableRefference();
 					              }   
 				                 else {
+									 if(bL.at(i).userData.act.bClickEnabled==false){
 					                   bL.at(i).userData.act.bClickEnabled = true;
 					                   AntActor(bL.at(i).userData.graphic).gotoAndStop(2);
 					                   bL.at(i).userData.act.enableRefference();
+									 }
 					              }
 								 }
 								break;
+								
+					   case "hero1":
+						if (!bL.at(i).userData.act.ropeEnabled) {
+						 if(!bL.at(i).userData.act.balloonEnabled){
+						  //createBalloon(new Vec2(AntG.mouse.x, AntG.mouse.y), bL.at(0));
+						  //Body(bL.at(0)).userData.act.balloonEnabled = true;
+						   bL.at(i).gravMass = -bL.at(0).gravMass; 
+						   
+						   if(bL.at(i).gravMass>0)
+						    bL.at(i).userData.graphic.addAnimationFromCache("mc_hero1");
+						   else
+						    bL.at(i).userData.graphic.addAnimationFromCache("hero1_a1");
+						  }
+						 }
+						  else{ 
+					           actorForDelete.push(bL.at(i).userData.act.ropeComp);
+					           bL.at(i).userData.act.ropeComp =  null;
+					           bL.at(i).userData.act.ropeEnabled = false;
+							  //bL.at(0).gravMass = -bL.at(0).gravMass;
+					          }
+					 break;
+				     
+				    case "hero2":
+						
+					 if (!bL.at(i).userData.act.ropeEnabled) {
+							
+						
+					    if(!Body(bL.at(i)).userData.act.jumpRayEnabled){
+						 addJumpRays(Body(bL.at(i)));
+						 
+						}
+						if(Body(bL.at(i)).userData.act.canJump){
+					        
+						    bL.at(i).userData.graphic.addAnimationFromCache("hero2_a1");
+							heroJump(bL.at(i));
+						}
+						else{ 
+						 trace("in flying");
+						 //bL.at(i).userData.graphic.addAnimationFromCache("mc_hero2"); 
+						}
+						 
+					 }	
+					 else{ 
+					   actorForDelete.push(bL.at(i).userData.act.ropeComp);
+					   bL.at(i).userData.act.ropeComp =  null;
+					   bL.at(i).userData.act.ropeEnabled = false;
+					 }
+					 
+					 	 //createBalloon(new Vec2(AntG.mouse.x,AntG.mouse.y),bL.at(0));
+					/*	 if (Body(bL.at(0)).userData.act.contactCounterIce > 0) {
+							     
+							     removeIceUnderHero2(Body(bL.at(0)).userData.act.iceUnderHero);   
+							   }*/
+					 break;
+					 
+				 case "hero3":
+					 
+					  if (bL.at(i).userData.act.ropeEnabled) {
+						  actorForDelete.push(bL.at(i).userData.act.ropeComp);
+					      bL.at(i).userData.act.ropeComp =  null;
+					      bL.at(i).userData.act.ropeEnabled = false;
+						  } 
+					     
+						  createExplosion(bL.at(i));
+						  
+						   var boomBoom:AntActor = new AntActor();
+						  boomBoom.addAnimationFromCache("boom");	 
+				          boomBoom.x = bL.at(i).position.x;
+				          boomBoom.y = bL.at(i).position.y;
+				          boomBoom.angle = bL.at(i).rotation;
+				          boomBoom.gotoAndPlay(2);
+				          add(boomBoom);
+				          effectArray.push(new effects(boomBoom, bL.at(i).position, bL.at(i).rotation, "boom"));
+						  
+						  actorForDelete.push(bL.at(i).userData.act);
+						 
+						 
+						// gameCompleted();
+					 break;
+				    
+				 case "hero4":
+					 if(!bL.at(i).userData.act.ropeEnabled)
+					   recreateHero(bL.at(i));
+					 else{ 
+					   actorForDelete.push(bL.at(i).userData.act.ropeComp);
+					   bL.at(i).userData.act.ropeComp =  null;
+					   bL.at(i).userData.act.ropeEnabled = false;
+					 }
+				 break; 
 								default:
 								break;
 							  }
@@ -811,12 +954,14 @@ package
 			if(b.userData.act.polygon.sensorEnabled == true){
 			 b.userData.act.polygon.sensorEnabled = false;
 			 b.userData.act.circle.sensorEnabled = true;
-			 AntActor(b.userData.graphic).gotoAndStop(1);
+			 b.userData.graphic.addAnimationFromCache("mc_hero4");
+			
 			}
 			else {
 			       b.userData.act.polygon.sensorEnabled = true;
 			       b.userData.act.circle.sensorEnabled = false;
-			       AntActor(b.userData.graphic).gotoAndStop(2);	
+				    b.userData.graphic.addAnimationFromCache("hero4_a0");
+			       
 				 }
 			
 		}
@@ -828,6 +973,14 @@ package
 			
 	} //end
 	
+	private function updateEffects():void
+	{
+		
+			for each(var e:effects in effectArray) 
+			  	e.update();
+			
+	} //end
+	
 	private function hideRayCast():void
 	   {
 		
@@ -835,6 +988,15 @@ package
 			  	r.hide();
 			
 	   }
+	   
+	private function hideEffects():void
+	   {
+		
+			for each(var e:effects in effectArray) 
+			  	e.hide();
+			
+	   }   
+	   
 		private function addJumpRays(b:Body):void 
 		{
 			var r1:rays;
@@ -862,6 +1024,14 @@ package
 			defGroup.sort("tag");
 			stopEngines();
 			defGroup;
+			var a:* = AntCookie(AntG.storage.get("cookie")).read("levels");
+			(a as Array)[int(AntG.storage.get("currentLevel"))-1] = 2;
+			if(int(AntG.storage.get("currentLevel"))!=28)
+			 (a as Array)[int(AntG.storage.get("currentLevel"))] = 1;
+			else 
+			 trace("game completed");
+			AntCookie(AntG.storage.get("cookie")).write("levels", a);
+			
 		}
 		
 		private function gameCompleted():void 
@@ -874,6 +1044,7 @@ package
 		{
 			add(lFailed);
 			stopEngines();
+			AntG.sounds.play("failed");
 		}
 		private function stopEngines():void 
 		{
@@ -883,7 +1054,7 @@ package
 		
 		private function createExplosion(bb:Body):void 
 		{
-			const explosionRadius:Number = 100;
+			const explosionRadius:Number = 80;
 			const explosionStr:Number = 400;
 			
             var bodyList:BodyList = _space.bodiesInCircle(bb.position, explosionRadius, false, null, bodyList);
@@ -1305,6 +1476,7 @@ package
 			if(run){
 			deletingActors();
 			updateRayCast();
+			updateEffects();
 			_space.step(1 / 30);
 			}
 			 
@@ -1314,21 +1486,56 @@ package
 		private function deletingActors():void 
 		{
 			var n:int;
+			var iceX:AntActor = new AntActor();
+			var bug:AntActor = new AntActor();
+			
+			effectForDelete =  AntG.storage.get("effectForDelete");
 			if (actorForDelete.length > 0){
 		     for each(var aToDelete:actor in actorForDelete)
 		     {
 			  n = actorArray.indexOf(aToDelete);
 			  if(n!=-1){
 			   actorArray.splice(n, 1);
-			   if (aToDelete._type == "star")
+			   if (aToDelete._type == "star") {
+				bug.addAnimationFromCache("starAnimation");   
+				bug.x = aToDelete._body.position.x;
+				   bug.y = aToDelete._body.position.y;
+				   bug.angle = aToDelete._body.rotation;
+				  // ice2.scaleX = 3;
+				  // ice2.scaleY = 3;
+				   bug.gotoAndPlay(2);
+				   add(bug);
+				   effectArray.push(new effects(bug,aToDelete._body.position,aToDelete._body.rotation,"star"));
 			    starCounter--;
-	           if (starCounter <= 0)
-			    levelCompleted();
-				
-			  }
+			   }
+			   if (aToDelete._type == "ice") {
+				   
+				  if (aToDelete._body.userData.graphic.width < 60){
+				     iceX.addAnimationFromCache("iceBoom11");
+				  }
+				  if ((aToDelete._body.userData.graphic.width > 60)&&(aToDelete._body.userData.graphic.width<100))
+						iceX.addAnimationFromCache("iceBoom12");
+							
+				  if (aToDelete._body.userData.graphic.width > 100)
+						iceX.addAnimationFromCache("iceBoom14");
+							 
+				   iceX.x = aToDelete._body.position.x;
+				   iceX.y = aToDelete._body.position.y;
+				   iceX.angle = aToDelete._body.rotation;
+				  // ice2.scaleX = 3;
+				  // ice2.scaleY = 3;
+				   iceX.gotoAndPlay(2);
+				   add(iceX);
+				   effectArray.push(new effects(iceX,aToDelete._body.position,aToDelete._body.rotation,"ice"));
+				}
+					
+	           if ((starCounter <= 0)&&(AntG.storage.get("gameStatus")!="failed")) {
+				   
+			        AntG.storage.set("gameStatus", "levelCompleted");  
+			   }
 		     }
 		    }
-			
+			}
 			
 			if (raysForDelete.length > 0){
 		     for each(var rayToDelete:rays in raysForDelete)
@@ -1341,6 +1548,21 @@ package
 		     }
 			 raysForDelete = [];
 		    }
+			
+			if (effectArray.length > 0){
+		     for each(var effectToDelete:effects in effectForDelete)
+		     {
+				 effectToDelete.remove();
+			  n = effectArray.indexOf(effectToDelete);
+			  if(n!=-1){
+			   effectArray.splice(n, 1);
+			   
+			  }
+		     }
+			 effectForDelete = [];
+			 AntG.storage.set("effectForDelete",effectForDelete);
+		    }
+			
 			
 			if (actorForDelete.length > 0){
 			 for each(var itemToDelete:actor in actorForDelete ) { 
@@ -1355,8 +1577,31 @@ package
 						itemToDelete._body.compound.bodies.at(i).userData.act.removeActor();
 				   }
 			       		
-			        if ((itemToDelete._body.userData.act.shType == "balloon")||(itemToDelete._body.userData.act.shType == "rope"))
+			        if ((itemToDelete._body.userData.act.shType == "balloon")||(itemToDelete._body.userData.act.shType == "rope")){
  			        _space.compounds.remove(itemToDelete._body.compound);
+					 
+					if ((itemToDelete._body.userData.act.shType == "balloon")) {
+					  var bb:Body;
+					  for (var j:int =0; j < itemToDelete._body.compound.bodies.length; j++ ) {
+						if (itemToDelete._body.compound.bodies.at(j).userData.act is actorCircle){
+						 bb = itemToDelete._body.compound.bodies.at(j);
+						 continue;
+						}
+					  }	
+						
+					  var balloonX:AntActor =  new AntActor();
+					  balloonX.addAnimationFromCache("boomBallons");
+							 
+				      balloonX.x = bb.position.x;
+				      balloonX.y = bb.position.y;
+				      balloonX.angle = bb.rotation;
+				 
+				      balloonX.gotoAndPlay(2);
+				      add(balloonX);
+				      effectArray.push(new effects(balloonX,bb.position,bb.rotation,"ice"));
+						 
+					 }
+					}
 				  } 
 			  n = actorForDelete.indexOf(itemToDelete);
 			  if(n!=-1)
@@ -1364,6 +1609,7 @@ package
 			 }
 			  //actorForDelete =[];
 			}
+		
 		}
 		override public function postUpdate():void
 		{
@@ -1372,9 +1618,8 @@ package
 			
 			super.postUpdate();
 			
-			if (AntG.storage.get("gameStatus") == "failed") {
-				 levelFailed();
-				}
+			checkGameStatus(AntG.storage.get("gameStatus"));
+			
 		}
 		override public function destroy():void
 		{
@@ -1389,6 +1634,46 @@ package
 		 */
 	
 
+	
+	
+	private function checkGameStatus(status:String):void 
+	{
+		if ((status!="none")&&(currentGameStatus == status)) {
+			gameStatusCounter++;
+			currentGameStatus = status;
+			
+			}
+		else { 
+		 if(currentGameStatus!="failed")	
+		  currentGameStatus = status;
+		 else {
+		  AntG.storage.set("gameStatus", "failed");
+		  //run = false;
+		 }
+			
+		 // gameStatusCounter++;	
+		}
+		if(gameStatusCounter>=45){
+		switch(status) {
+			case "failed":
+				levelFailed();
+				
+				AntG.storage.set("gameStatus","none");
+			break;
+		    case "levelCompleted":
+			 levelCompleted();
+			 AntG.storage.set("gameStatus","none");
+			break;
+		    case "gameCompleted":
+			 gameCompleted();
+			 AntG.storage.set("gameStatus","none");
+			break;
+		    default:
+			 AntG.storage.set("gameStatus","none");
+			break;
+		}
+		gameStatusCounter = 0;			
 	}
-
+  } 
+ }
 }

@@ -20,7 +20,7 @@ package
 	public class actorCircle extends actor
 	{
 		public var magnetEnabled:Boolean =  false;
-		
+		public var initAngle:Number =  0;
 		public var filt:InteractionFilter = new InteractionFilter();
 		public var LeverType:int =  0;
 		public var contactCounter:int = 0;
@@ -79,6 +79,7 @@ package
 		{
 	     isStatic = _isStatic;
 			rayType = _rayType;
+			 initAngle = _rotation;
 			gameType = _gameType;
 		   refType = _refType;
 		  refNumber = _refNumber;
@@ -257,6 +258,7 @@ package
 		if (isStatic) {
              img.clearAnimations();
 			}
+		img.angle = (rotation * 180 / Math.PI) % 360 ;	
 		body.userData.graphic = img;
 		
 		if (shType == "balloon")
@@ -291,7 +293,7 @@ package
 		   break;
 		}
 		//body.userData.graphic.
-        Arrow.angle = 180/Math.PI*(Vec2(body.userData.act.velxy).angle);	   
+        Arrow.angle = 180/Math.PI*(Vec2(body.userData.act.velxy).angle) - body.rotation * Math.PI/180;	   
 		AntActor(body.userData.graphic).add(Arrow);
 	}
 		public function checkAngle():void {
@@ -311,7 +313,7 @@ package
 					 
 					 refActor._body.velocity.setxy(refActor.velxy.x, refActor.velxy.y);
 	                if((refActor.Arrow)&&!((refActor.velxy.x==0)&&(refActor.velxy.y==0)))
-					 refActor.Arrow.angle = 180/Math.PI*(Vec2(refActor.velxy).angle);
+					 refActor.Arrow.angle = 180/Math.PI*(Vec2(refActor.velxy).angle) - Body(refActor._body).rotation * 180/Math.PI ;
 				 break;
 				 
 				  case "buttonMove":
@@ -384,10 +386,10 @@ package
 					 refActor.velxy.y = refActor._body.velocity.y;
 					 
 					 refActor._body.velocity.setxy(0, 0);
-					  if (refActor.magnetJointInited) {
+					  if (refActor.magnetJoint) {
 						   AntG.space.constraints.remove(refActor.magnetJoint);
 						   refActor.magnetJoint = null;
-						   refActor.magnetJointInited = false;
+						   refActor.magnetJointInited = true;
 						  }
 				 break;
 				 

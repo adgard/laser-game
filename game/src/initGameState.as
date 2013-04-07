@@ -9,6 +9,31 @@ package
 	
 	public class initGameState extends AntState
 	{
+		
+		
+		 [Embed(source="sounds/button.mp3" )]
+           public var button_snd:Class;
+		   
+		 [Embed(source="sounds/kill.mp3" )]
+           public var kill_snd:Class;  
+		   
+		 [Embed(source="sounds/fail.mp3" )]
+           public var failed_snd:Class;  
+		   
+		  [Embed(source="sounds/balloon.mp3" )]
+           public var balloon_snd:Class;   
+		   
+		  [Embed(source="sounds/beetle.mp3" )]
+           public var beetle_snd:Class;    
+		   
+		   [Embed(source="sounds/game_button.mp3" )]
+           public var game_button_snd:Class; 
+		   
+		   [Embed(source="sounds/click_button.mp3" )]
+           public var click_button_snd:Class;      
+		   
+		   
+		
 		private var _camera:AntCamera;
 			private var mcForRasterization:Vector.<Class> = new Vector.<Class>; 
 		private var mmenu:AntActor;
@@ -19,8 +44,12 @@ package
 
 		private var mcArrayFromLevel:Array = [];
 		private var loader:AntAssetLoader = new AntAssetLoader();
-			
+		private var cookie:AntCookie;	
 		protected var _started:Boolean = false;
+		private var cashMovie:MovieClip = new backCashing();
+		private var aAnim:AntAnimation =  new AntAnimation();
+		private var aActor:AntActor =  new AntActor();
+		private var levelNumberArray:Array = [];
 		
 		public function initGameState()
 		{
@@ -30,14 +59,17 @@ package
 		override public function create():void
 		{
 			
+			createLevels();
 			
 			_started = false;
 			
 			new fakeClass();
 			//createNapeSpace();
-			
-			
-			 sharedObj.open("mutation");
+			aAnim.makeFromMovieClip(cashMovie)
+            aActor.addAnimation(aAnim);
+            add(aActor);
+            		
+			 //sharedObj.open("mutation");
 			 loadDataToStorage();
 			 
 			_camera = new AntCamera(0,0,640, 480);
@@ -46,7 +78,31 @@ package
 			AntG.addCamera(_camera);
 			
 			AntG.track(_camera, "menuCamera");
-			AntG.storage.set("currentLevel",1);
+			AntG.storage.set("currentLevel",0);
+			
+			
+			var cookie:AntCookie = new AntCookie();
+            cookie.open("goldBeatles1");
+			
+			var arrLevels:*  = (cookie.read("levels"));
+			
+			if (arrLevels == null) {
+				arrLevels = [];
+			 for (var n:int = 0; n < 28; n++ )
+			  (arrLevels as Array).push(0); 
+			  
+			  arrLevels[0] = 1;
+			  
+			  cookie.write("levels", arrLevels);
+			  trace("levels inited");
+				  
+			}
+			else {
+				  trace("levels loaded");
+				  cookie.write("levels", arrLevels);
+				 }
+			
+			AntG.storage.set("cookie",cookie);
 			
 			
 			//Добавляем классы клипов которые необходимо растеризировать.
@@ -57,8 +113,19 @@ package
 			
 		
 			loader.addClips(mcForRasterization); 
-			loader.addClips(new <Class>[clockOrange,leverImg,jointForMouse,arrows]);
-			loader.addClips(new <Class>[node1, node2, balloon1,mc_node]); 
+			loader.addClips(new <Class>[leverImg,jointForMouse,arrows,iceBoom11,iceBoom12,iceBoom14,boom,boomBallons,boom4]);
+			loader.addClips(new <Class>[node1, node2, balloon1,mc_node,hero1_a1,hero1_a2,hero2_a1,hero2_a2,hero3_a2,hero4_a0,hero4_a2,hero4_a2_2,bugAnimation,starAnimation]); 
+			
+			
+			//AntG.sounds.baseURL = "sounds/";
+			AntG.sounds.addEmbedded(button_snd, "button");
+			AntG.sounds.addEmbedded(kill_snd, "kill");
+			AntG.sounds.addEmbedded(failed_snd, "failed");
+			AntG.sounds.addEmbedded(ballon_snd, "balloon");
+			AntG.sounds.addEmbedded(beetle_snd, "beetle");
+			AntG.sounds.addEmbedded(game_button_snd, "gButton");
+			AntG.sounds.addEmbedded(click_button_snd, "cButton");
+			
 			
 			// Добавляем обработчик для завершения процесса растеризации.
 			loader.eventComplete.add(onCacheComplete);
@@ -66,6 +133,98 @@ package
 			// Запускаем процесс растеризации клипов.
 			
 			initcbTypes();
+		}
+		
+		private function createLevels():void 
+		{
+		//level 1
+		levelNumberArray.push(26);
+		// level 2
+		levelNumberArray.push(2);
+		// level 3
+		levelNumberArray.push(27);
+		// level 4
+		levelNumberArray.push(3);
+		
+		// level 5
+		levelNumberArray.push(4);
+		
+		// level 6
+		levelNumberArray.push(24);
+		
+		// level 7
+		levelNumberArray.push(6);
+		
+		// level 8
+		levelNumberArray.push(14);
+		
+		// level 9
+		levelNumberArray.push(13);
+		
+		// level 10
+		levelNumberArray.push(12);
+		
+		// level 11
+		levelNumberArray.push(8);
+		
+		// level 12
+		levelNumberArray.push(28);
+		
+		// level 13
+		levelNumberArray.push(5);
+		
+		// level 14
+		levelNumberArray.push(18);
+		
+		// level 15
+		levelNumberArray.push(17);
+		
+		// level 16
+		levelNumberArray.push(16);
+		
+		// level 17
+		levelNumberArray.push(22);
+		
+		// level 18
+		levelNumberArray.push(23);
+		
+		// level 19
+		levelNumberArray.push(7);
+		
+		// level 20
+		levelNumberArray.push(9);
+		
+		// level 21
+		levelNumberArray.push(18);
+		
+		// level 22
+		levelNumberArray.push(20);
+		
+		
+		// level 23
+		levelNumberArray.push(19);
+		
+		// level 23
+		levelNumberArray.push(15);
+		
+		// level 24
+		levelNumberArray.push(1);
+		
+		// level 25
+		levelNumberArray.push(25);
+		
+		// level 26
+		levelNumberArray.push(11);
+		
+		// level 27
+		levelNumberArray.push(10);
+		
+		// level 28
+		levelNumberArray.push(21);
+		
+		AntG.storage.set("levelNumbers",levelNumberArray);
+		 
+		
 		}
 		
 		private function startCashing():void 
@@ -97,7 +256,7 @@ package
 			var refLevelBG:Class = getDefinitionByName(levelBG) as Class;
 			
 			
-			var currentLevel:MovieClip =  (new refLevel() as MovieClip); //тащим мувиклип с левелом из библиотеки
+			var currentLevel:MovieClip =  (new refLevel() as MovieClip); 
            // var currentBG:MovieClip =  (new refLevelBG() as MovieClip); //тащим мувиклип с левелом из библиотеки
             
 			parseLevel(currentLevel);
@@ -202,6 +361,7 @@ package
 		
 		private function goToPlayGame(aButton:AntButton):void 
 		{
+			remove(aActor);
 			AntG.anthill.switchState(new playGameState());
 		}
 		

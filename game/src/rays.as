@@ -180,6 +180,9 @@ package
 					  if (type == "heroRay") {
 						   if (rayResult != null) {
 							 rayBody.userData.act.canJump = true;
+							 
+							 if (AntG.storage.get("gameStatus") != "failed")
+							  rayBody.userData.graphic.addAnimationFromCache("mc_hero2"); 
 							 rayBody.userData.act.rayFailedCounter = 0;
 							 rayMC.visible =  false;
 							 
@@ -189,6 +192,8 @@ package
 							     rayBody.userData.act.rayFailedCounter++; 
 								  if (rayBody.userData.act.rayFailedCounter >= 3) {
 									   rayBody.userData.act.canJump = false;
+									   if(AntG.storage.get("gameStatus")!="failed")
+									    rayBody.userData.graphic.addAnimationFromCache("hero2_a1"); 
 									   rayBody.userData.act.rayFailedCounter = 0;
 									  }
 									return;  
@@ -212,11 +217,25 @@ package
 							   return;
 							   
 							 break;
-							 case "intake":
+						 case "intake":
+							  if (((type == "killer") || (type == "emitter")) && (String(rayResult.shape.body.userData.act.gameType).substring(0, 4) == "hero")) {
+							  AntG.storage.set("gameStatus", "failed");
+							  
+							  AntG.sounds.play("kill");
+							 if(rayResult.shape.body.userData.act.polygon.sensorEnabled == true)
+							    rayResult.shape.body.userData.graphic.addAnimationFromCache(String(rayResult.shape.body.userData.act.gameType).substr(0, 5) + "_a2_2");
+							   else  
+							    rayResult.shape.body.userData.graphic.addAnimationFromCache(String(rayResult.shape.body.userData.act.gameType).substr(0, 5) + "_a2");
+								
+							  rayResult.shape.body.userData.graphic.repeat = false;
+								return;
+							 }
+							 else {
 					           applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
 							   rayMCEnd.graphics.drawCircle(resultPt.x,resultPt.y,4)
 							   return;
-							  break
+							 }  
+							  break;
 						     
 							 case "reflex":
 					         // trace("reflex"); 
@@ -274,10 +293,24 @@ package
 								 }
 							   return;
 							 case "intake":
-					           applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
+							 if (((type == "killer") || (type == "emitter")) && (String(rayResult.shape.body.userData.act.gameType).substring(0, 4) == "hero")) {
+							  AntG.storage.set("gameStatus", "failed");
+							  AntG.sounds.play("kill");
+							   if(rayResult.shape.body.userData.act.polygon.sensorEnabled == true)
+							    rayResult.shape.body.userData.graphic.addAnimationFromCache(String(rayResult.shape.body.userData.act.gameType).substr(0, 5) + "_a2_2");
+							   else  
+							    rayResult.shape.body.userData.graphic.addAnimationFromCache(String(rayResult.shape.body.userData.act.gameType).substr(0, 5) + "_a2");
+							  
+							  rayResult.shape.body.userData.graphic.repeat = false;
+								return;
+							 }
+					         else {  
+								 applyImpulses(type, rayResult.shape.body, resultPt, prevVec2.normalise());
 							   rayMCEnd.graphics.drawCircle(resultPt.x, resultPt.y, 4);
+							 }
 							   return;
 							  break
+							 
 						     
 							 case "reflex":
 					          trace("reflex"); 

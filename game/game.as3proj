@@ -60,7 +60,7 @@
     <element path="lib\ui3.swc" />
     <element path="lib\levelsBG.swc" />
     <element path="lib\game.swc" />
-    <element path="lib\nape-dev.swc" />
+    <element path="lib\nape-release.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>

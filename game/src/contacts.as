@@ -112,6 +112,7 @@ package
 		
 		private function beginCollisionHandlerMagnet(cb:InteractionCallback):void 
 		{
+			var p:Vec2;
 			if (cb.int1.userData.act.gameType == "magnet") { 
 				var jPiv:PivotJoint;
 				var colArb:CollisionArbiter;
@@ -129,7 +130,7 @@ package
 								 }
 								 
 							 if(b!=null){
-							   b.userData.act.magnetJointInited = false;
+							  // b.userData.act.magnetJointInited = false;
 					           b.userData.act.magnetJoint.space = null;
 				               b.userData.act.magnetJoint = null;   
 						    }
@@ -137,22 +138,39 @@ package
 				  
 			               Body(cb.int1).velocity.setxy(-Body(cb.int1).velocity.x, -Body(cb.int1).velocity.y);
 						   
-						   if (cb.arbiters.at(0).collisionArbiter != null)
-						    colArb = cb.arbiters.at(0).collisionArbiter;
-						   else 
-						    colArb = cb.arbiters.at(1).collisionArbiter;
+						   for (var i:int = 0 ; i < cb.arbiters.length ; i++ ){
 						    
-						   jPiv = new PivotJoint(Body(cb.int1), Body(cb.int2), Body(cb.int1).worldPointToLocal(colArb.contacts.at(0).position),Body(cb.int2).worldPointToLocal(colArb.contacts.at(0).position));
-						   jPiv.ignore = false;
-	                       jPiv.space = AntG.space;
-				           cb.int1.userData.act.magnetJointInited = true;	
-						   cb.int1.userData.act.magnetJoint = jPiv;
-				           trace("init joint");
+							trace(cb.arbiters.at(i).isCollisionArbiter());
+							
+						      if (cb.arbiters.at(i).isCollisionArbiter()) {
+							       colArb = cb.arbiters.at(i).collisionArbiter;
+								   trace(colArb.contacts.at(0).position);
+								   trace(colArb.contacts.at(1).position);
+								   
+								   if (colArb.contacts.length == 1)
+								     p =  colArb.contacts.at(0).position; 
+								   else {	 
+								   if(AntG.space.bodiesInCircle(colArb.contacts.at(0).position,5).length <2)
+								    p = colArb.contacts.at(1).position;
+								   else 
+								    p = colArb.contacts.at(0).position;
+								   }
+									
+								   cb.int1.userData.act.magnetJointInited = true;
+								    jPiv = new PivotJoint(Body(cb.int1), Body(cb.int2), Body(cb.int1).worldPointToLocal(p),Body(cb.int2).worldPointToLocal(p));
+						             jPiv.ignore = false;
+	                                 jPiv.space = AntG.space;
+				                    
+						             cb.int1.userData.act.magnetJoint = jPiv;
+									 return;
+								  }
+						   }
+						    
 						
 			  }
 			 }
 		    else {
-			  if(cb.int2.userData.act.magnetJointInited== false){	
+			  if(cb.int2.userData.act.magnetJointInited == false){	
 			     
 				       
 				     if (Body(cb.int1).constraints.length > 0)
@@ -167,29 +185,48 @@ package
 								 }
 								 
 							 if(b!=null){
-							   b.userData.act.magnetJointInited = false;
+							  // b.userData.act.magnetJointInited = false;
 					           b.userData.act.magnetJoint.space = null;
 				               b.userData.act.magnetJoint = null;   
 						    }
 						   }
 				  
 				  
-				        if (cb.arbiters.at(0).collisionArbiter != null)
-						    colArb = cb.arbiters.at(0).collisionArbiter;
-						else 
-						   colArb = cb.arbiters.at(1).collisionArbiter;     
+				       
 				  
 				       Body(cb.int2).velocity.setxy(-Body(cb.int2).velocity.x, -Body(cb.int2).velocity.y);
-				       jPiv = new PivotJoint(Body(cb.int2), Body(cb.int1), Body(cb.int2).worldPointToLocal(colArb.contacts.at(0).position),Body(cb.int1).worldPointToLocal(colArb.contacts.at(0).position));
-					   jPiv.ignore = false;
-	                   jPiv.space = AntG.space;
-				       trace("init joint");
-				       cb.int2.userData.act.magnetJointInited = true;
-					   cb.int2.userData.act.magnetJoint = jPiv;
+				       
+					   for (var i:int = 0 ; i < cb.arbiters.length ; i++ ){
+						   
+							trace(cb.arbiters.at(i).isCollisionArbiter());
+							
+						      if (cb.arbiters.at(i).isCollisionArbiter()) {
+							       colArb = cb.arbiters.at(i).collisionArbiter;
+								   
+								   cb.int2.userData.act.magnetJointInited = true;
+								   
+								   if (colArb.contacts.length == 1)
+								     p =  colArb.contacts.at(0).position; 
+								   else {	 
+								   if(AntG.space.bodiesInCircle(colArb.contacts.at(0).position,5).length <2)
+								    p = colArb.contacts.at(1).position;
+								   else 
+								    p = colArb.contacts.at(0).position;
+								   }
+									
+									 
+								    jPiv = new PivotJoint(Body(cb.int1), Body(cb.int2), Body(cb.int1).worldPointToLocal(p),Body(cb.int2).worldPointToLocal(p));
+						             jPiv.ignore = false;
+	                                 jPiv.space = AntG.space;
+				                     
+						             cb.int1.userData.act.magnetJoint = jPiv;
+									 return;
+								  }
+						   }
 					
 				}
 				  else {
-				     cb.int2.userData.act.magnetJointInited = false;
+				  //   cb.int2.userData.act.magnetJointInited = false;
 					 cb.int2.userData.act.magnetJoint.space = null;
 				     cb.int2.userData.act.magnetJoint = null;
 				           
@@ -229,7 +266,7 @@ package
 		   var opt2:OptionType = new OptionType(AntG.storage.get("spikeCBT"));
 		  //var opt1:OptionType = new OptionType(AntG.storage.get("balloonCBT"));
 		   
-			var beginCollideListener:InteractionListener = new InteractionListener(CbEvent.BEGIN, InteractionType.COLLISION, opt1, opt2, beginCollisionHandlerSpikes);
+			var beginCollideListener:InteractionListener = new InteractionListener(CbEvent.BEGIN, InteractionType.SENSOR, opt1, opt2, beginCollisionHandlerSpikes);
 			
 			 AntG.space.listeners.add(beginCollideListener);
 			
@@ -242,6 +279,14 @@ package
 			  if (cb.int2.userData.act._deleted == false) {	
 				  if (String(cb.int2.userData.act.gameType).substr(0, 4) == "hero") {
 			       AntG.storage.set("gameStatus", "failed");
+				   AntG.sounds.play("kill");
+				   
+				   if(cb.int2.userData.act.polygon.sensorEnabled == true)
+				    cb.int2.userData.graphic.addAnimationFromCache(String(cb.int2.userData.act.gameType).substr(0, 5) + "_a2_2");
+				   else 
+				    cb.int2.userData.graphic.addAnimationFromCache(String(cb.int2.userData.act.gameType).substr(0, 5) + "_a2");
+				    
+				   cb.int2.userData.graphic.repeat = false;
 				   cb.int2.userData.act._deleted = true;
 				  }
 				  else 
@@ -255,6 +300,13 @@ package
 			  if (cb.int1.userData.act._deleted == false) {	
 				  if (String(cb.int1.userData.act.gameType).substr(0, 4) == "hero") {
 			       AntG.storage.set("gameStatus", "failed");
+				   AntG.sounds.play("kill");
+				  if(cb.int1.userData.act.polygon.sensorEnabled == true)
+				    cb.int1.userData.graphic.addAnimationFromCache(String(cb.int1.userData.act.gameType).substr(0, 5) + "_a2_2");
+				   else 
+				    cb.int1.userData.graphic.addAnimationFromCache(String(cb.int1.userData.act.gameType).substr(0, 5) + "_a2");
+				   cb.int1.userData.graphic.repeat = false;
+				   
 				   cb.int1.userData.act._deleted = true;
 				  }
 				  else 

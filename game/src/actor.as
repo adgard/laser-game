@@ -75,7 +75,7 @@ public class actor extends EventDispatcher
 	  
 	   if (actorBox(_body.userData.act)._refType == "buttonMove") {
 		_body.position = Body(_body.userData.act.buttonNode._body).localPointToWorld(_body.userData.act.buttonNode.buttonNodePoint);
-		_body.rotation = Body(_body.userData.act.buttonNode._body).rotation;
+		_body.rotation = Body(_body.userData.act.buttonNode._body).rotation + _body.userData.act.initAngle ;
 
 		}	
 	  
@@ -138,7 +138,11 @@ public class actor extends EventDispatcher
 		
 		(_body.userData.act).checkAngle();
 		
+        if ((actorCircle(_body.userData.act)._refType == "buttonClick")&&(actorCircle(_body.userData.act).isMoveable)) {
+		_body.position = Body(_body.userData.act.buttonNode._body).localPointToWorld(_body.userData.act.buttonNode.buttonNodePoint);
+		_body.rotation = Body(_body.userData.act.buttonNode._body).rotation + _body.userData.act.initAngle;
 
+		}
 	}
 	   
     AntActor(_body.userData.graphic).x = _body.position.x;
