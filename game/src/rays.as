@@ -201,8 +201,10 @@ package
 						    
 					  }	  
 						////////////////////
-					  if (rayResult == null)
+					  if (rayResult == null){
+					      rayMCEnd.graphics.drawCircle(resultPt.x,resultPt.y,4)
 						  return;
+					  }
 						  
 						 switch(rayResult.shape.body.userData.act.rayType) {
 							 case "destroyed":
@@ -219,9 +221,12 @@ package
 							 break;
 						 case "intake":
 							  if (((type == "killer") || (type == "emitter")) && (String(rayResult.shape.body.userData.act.gameType).substring(0, 4) == "hero")) {
-							  AntG.storage.set("gameStatus", "failed");
 							  
-							  AntG.sounds.play("kill");
+							  if((!AntG.sounds.isPlaying("kill")&&AntG.storage.get("gameStatus")!="failed"))
+							   AntG.sounds.play("kill");
+							AntG.storage.set("gameStatus", "failed");
+							  
+							   
 							 if(rayResult.shape.body.userData.act.polygon.sensorEnabled == true)
 							    rayResult.shape.body.userData.graphic.addAnimationFromCache(String(rayResult.shape.body.userData.act.gameType).substr(0, 5) + "_a2_2");
 							   else  
@@ -279,8 +284,10 @@ package
 						   rayMC2.graphics.lineTo(resultPt.x, resultPt.y);
 						   
 						   
-						   if (rayResult == null)
-						  return;
+						   if (rayResult == null) {
+							   rayMCEnd.graphics.drawCircle(resultPt.x,resultPt.y,4)
+						     return;
+						   }
 						  
 						    switch(rayResult.shape.body.userData.act.rayType) {
 							 case "destroyed":
@@ -294,8 +301,11 @@ package
 							   return;
 							 case "intake":
 							 if (((type == "killer") || (type == "emitter")) && (String(rayResult.shape.body.userData.act.gameType).substring(0, 4) == "hero")) {
-							  AntG.storage.set("gameStatus", "failed");
-							  AntG.sounds.play("kill");
+							 
+							  if((!AntG.sounds.isPlaying("kill")&&AntG.storage.get("gameStatus")!="failed"))
+							   AntG.sounds.play("kill");
+							 
+							   AntG.storage.set("gameStatus", "failed"); 
 							   if(rayResult.shape.body.userData.act.polygon.sensorEnabled == true)
 							    rayResult.shape.body.userData.graphic.addAnimationFromCache(String(rayResult.shape.body.userData.act.gameType).substr(0, 5) + "_a2_2");
 							   else  

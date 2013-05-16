@@ -10,7 +10,9 @@ package
 	public class initGameState extends AntState
 	{
 		
-		
+		 [Embed(source="sounds/boxCircle.mp3" )]
+           public var boxCircle_snd:Class;
+		   
 		 [Embed(source="sounds/button.mp3" )]
            public var button_snd:Class;
 		   
@@ -26,20 +28,43 @@ package
 		  [Embed(source="sounds/beetle.mp3" )]
            public var beetle_snd:Class;    
 		   
-		   [Embed(source="sounds/game_button.mp3" )]
-           public var game_button_snd:Class; 
+		   [Embed(source="sounds/button_game.mp3" )]
+           public var button_game_snd:Class; 
 		   
 		   [Embed(source="sounds/click_button.mp3" )]
-           public var click_button_snd:Class;      
+           public var button_click_snd:Class;      
 		   
+		   
+		   [Embed(source="sounds/lazer.mp3" )]
+           public var lazer_snd:Class;  
+		   
+		     [Embed(source="sounds/victory.mp3" )]
+           public var victory_snd:Class;     
 		   
 		
+		     [Embed(source="sounds/bombHero.mp3" )]
+           public var bomb_snd:Class;     
+		   
+		   [Embed(source="sounds/jump.mp3" )]
+           public var jump_snd:Class;     
+		   
+		   [Embed(source="sounds/ice.mp3" )]
+           public var ice_snd:Class;     
+		   
+		   
+		   [Embed(source="sounds/nitka.mp3" )]
+           public var nitka_snd:Class;     
+		   
+		   [Embed(source="sounds/loop.mp3" )]
+           public var loop_snd:Class;  
+		   
+		   
 		private var _camera:AntCamera;
 			private var mcForRasterization:Vector.<Class> = new Vector.<Class>; 
 		private var mmenu:AntActor;
 		private var btn:AntButton;
 		public var storage:AntStorage = new AntStorage(true);
-		public var sharedObj:AntCookie = new AntCookie();
+		//public var sharedObj:AntCookie = new AntCookie();
 	    private var levelNumber:int = 0; 
 
 		private var mcArrayFromLevel:Array = [];
@@ -69,8 +94,6 @@ package
             aActor.addAnimation(aAnim);
             add(aActor);
             		
-			 //sharedObj.open("mutation");
-			 loadDataToStorage();
 			 
 			_camera = new AntCamera(0,0,640, 480);
 			_camera.fillBackground = true;
@@ -118,14 +141,23 @@ package
 			
 			
 			//AntG.sounds.baseURL = "sounds/";
+			AntG.sounds.addEmbedded(boxCircle_snd, "boxToCircle");
 			AntG.sounds.addEmbedded(button_snd, "button");
 			AntG.sounds.addEmbedded(kill_snd, "kill");
 			AntG.sounds.addEmbedded(failed_snd, "failed");
-			AntG.sounds.addEmbedded(ballon_snd, "balloon");
+			AntG.sounds.addEmbedded(balloon_snd, "balloon");
 			AntG.sounds.addEmbedded(beetle_snd, "beetle");
-			AntG.sounds.addEmbedded(game_button_snd, "gButton");
-			AntG.sounds.addEmbedded(click_button_snd, "cButton");
-			
+			AntG.sounds.addEmbedded(button_game_snd, "gButton");
+			AntG.sounds.addEmbedded(button_click_snd, "cButton");
+			AntG.sounds.addEmbedded(lazer_snd, "lazer");
+			AntG.sounds.addEmbedded(victory_snd, "victory");
+			AntG.sounds.addEmbedded(bomb_snd, "bomb");
+			AntG.sounds.addEmbedded(jump_snd, "jump");
+			AntG.sounds.addEmbedded(ice_snd, "ice");
+			AntG.sounds.addEmbedded(nitka_snd, "nitka");
+			AntG.sounds.addEmbedded(loop_snd, "loop");
+			//AntG.sounds.getAvailable("loop_snd").volume = 0.6;
+			AntG.sounds.volume = 0.5;
 			
 			// Добавляем обработчик для завершения процесса растеризации.
 			loader.eventComplete.add(onCacheComplete);
@@ -162,7 +194,7 @@ package
 		levelNumberArray.push(13);
 		
 		// level 10
-		levelNumberArray.push(12);
+		levelNumberArray.push(5);
 		
 		// level 11
 		levelNumberArray.push(8);
@@ -171,7 +203,7 @@ package
 		levelNumberArray.push(28);
 		
 		// level 13
-		levelNumberArray.push(5);
+		levelNumberArray.push(12);
 		
 		// level 14
 		levelNumberArray.push(18);
@@ -194,8 +226,6 @@ package
 		// level 20
 		levelNumberArray.push(9);
 		
-		// level 21
-		levelNumberArray.push(18);
 		
 		// level 22
 		levelNumberArray.push(20);
@@ -337,11 +367,7 @@ package
 			 }
 			}
 		}
-		private function loadDataToStorage():void 
-		{
-			storage.set("levelArray", sharedObj.read("levelArray"));
-			storage.set("lastLevel", sharedObj.read("lastLevel"));
-		}
+		
 		
 		
 		

@@ -185,7 +185,7 @@
 			progressText.visible = false;
 			removeEventListener(Event.ENTER_FRAME, checkFrame);
 			addChild(playButton);
-			playButton.x = 320;
+			playButton.x = 315;
 			playButton.y = 380;
 			playButton.addEventListener(MouseEvent.CLICK,startup)
 			

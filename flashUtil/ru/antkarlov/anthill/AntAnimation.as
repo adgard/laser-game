@@ -1,10 +1,12 @@
 package ru.antkarlov.anthill
 {
-	import flash.geom.Rectangle;
 	import flash.display.BitmapData;
-	import flash.geom.Matrix;
 	import flash.display.MovieClip;
+	import flash.display.Sprite;
 	import flash.geom.Point;
+	import flash.geom.Matrix;
+	import flash.geom.Rectangle;
+	
 	
 	/**
 	 * Данный класс используется для растеризации векторных клипов и для последующего их хранения в памяти.
@@ -44,17 +46,17 @@ package ru.antkarlov.anthill
 		/**
 		 * Массив кадров.
 		 */
-		public var frames:Array;
+		public var frames:Vector.<BitmapData>;
 		
 		/**
 		 * Массив смещений по X для каждого из кадров анимации.
 		 */
-		public var offsetX:Array;
+		public var offsetX:Vector.<Number>;
 		
 		/**
 		 * Массив смещений по Y для каждого из кадров анимации.
 		 */
-		public var offsetY:Array;
+		public var offsetY:Vector.<Number>;
 		
 		/**
 		 * Общее количество кадров анимации.
@@ -83,9 +85,9 @@ package ru.antkarlov.anthill
 			super();
 			
 			name = aName;
-			frames = [];
-			offsetX = [];
-			offsetY = [];
+			frames = new <BitmapData>[];
+			offsetX = new <Number>[];
+			offsetY = new <Number>[];
 			totalFrames = 0;
 		}
 		
@@ -119,6 +121,55 @@ package ru.antkarlov.anthill
 		}
 		
 		/**
+		 * Создает растровую однокадровую анимацию из указанного спрайта.
+		 * 
+		 * @param	aSprite	 Спрайт из которого необходимо создать растровую анимацию.
+		 */
+		public function makeFromSprite(aSprite:Sprite):void
+		{
+			totalFrames = 1;
+			
+			var rect:Rectangle;
+			var flooredX:int;
+			var flooredY:int;
+			var mtx:Matrix = new Matrix();
+			var scratchBitmapData:BitmapData = null;
+			
+			rect = aSprite.getBounds(aSprite);
+			rect.width = Math.ceil(rect.width) + INDENT_FOR_FILTER_DOUBLED;
+			rect.height = Math.ceil(rect.height) + INDENT_FOR_FILTER_DOUBLED;
+			
+			flooredX = Math.floor(rect.x) - INDENT_FOR_FILTER;
+			flooredY = Math.floor(rect.y) - INDENT_FOR_FILTER;
+			mtx.tx = -flooredX;
+			mtx.ty = -flooredY;
+			
+			scratchBitmapData = new BitmapData(rect.width, rect.height, true, 0);
+			scratchBitmapData.draw(aSprite, mtx);
+			
+			var trimBounds:Rectangle = scratchBitmapData.getColorBoundsRect(0xFF000000, 0x00000000, false);
+			trimBounds.x -= 1;
+			trimBounds.y -= 1;
+			trimBounds.width += 2;
+			trimBounds.height += 2;
+			
+			var bmpData:BitmapData = new BitmapData(trimBounds.width, trimBounds.height, true, 0);
+			bmpData.copyPixels(scratchBitmapData, trimBounds, DEST_POINT);
+			
+			flooredX += trimBounds.x;
+			flooredY += trimBounds.y;
+			
+			frames.push(bmpData);
+			offsetX.push(flooredX);
+			offsetY.push(flooredY);
+			
+			width = (width < trimBounds.width) ? trimBounds.width : width;
+			height = (height < trimBounds.height) ? trimBounds.height : height;
+			
+			scratchBitmapData.dispose();
+		}
+		
+		/**
 		 * Создает растровую анимацию из указанного клипа.
 		 * 
 		 * @param	aClip	 Клип из которого необходимо создать растровую анимацию.
@@ -136,14 +187,12 @@ package ru.antkarlov.anthill
 			var i:int = 1;
 			while (i <= totalFrames)
 			{
-				aClip.gotoAndStop(i);
-				childNextFrame(aClip);
 				rect = aClip.getBounds(aClip);
 				rect.width = Math.ceil(rect.width) + INDENT_FOR_FILTER_DOUBLED;
 				rect.height = Math.ceil(rect.height) + INDENT_FOR_FILTER_DOUBLED;
 				
-				flooredX = AntMath.floor(rect.x) - INDENT_FOR_FILTER;
-				flooredY = AntMath.floor(rect.y) - INDENT_FOR_FILTER;
+				flooredX = Math.floor(rect.x) - INDENT_FOR_FILTER;
+				flooredY = Math.floor(rect.y) - INDENT_FOR_FILTER;
 				mtx.tx = -flooredX;
 				mtx.ty = -flooredY;
 				
@@ -162,15 +211,16 @@ package ru.antkarlov.anthill
 				flooredX += trimBounds.x;
 				flooredY += trimBounds.y;
 				
-				frames[frames.length] = bmpData;
-				offsetX[offsetX.length] = flooredX;
-				offsetY[offsetY.length] = flooredY;
+				frames.push(bmpData);
+				offsetX.push(flooredX);
+				offsetY.push(flooredY);
 				
 				width = (width < trimBounds.width) ? trimBounds.width : width;
 				height = (height < trimBounds.height) ? trimBounds.height : height;
 				
 				scratchBitmapData.dispose();
-				i++;
+				aClip.gotoAndStop(++i);
+				childNextFrame(aClip);
 			}
 		}
 		
@@ -203,8 +253,8 @@ package ru.antkarlov.anthill
 				aFrameWidth = (aFrameWidth <= 0) ? pixels.width : aFrameWidth;
 				aFrameHeight = (aFrameHeight <= 0) ? pixels.height : aFrameHeight;
 				
-				var numFramesX:int = AntMath.floor(pixels.width / aFrameWidth);
-				var numFramesY:int = AntMath.floor(pixels.height / aFrameHeight);
+				var numFramesX:int = Math.floor(pixels.width / aFrameWidth);
+				var numFramesY:int = Math.floor(pixels.height / aFrameHeight);
 				var rect:Rectangle = new Rectangle();
 				rect.x = rect.y = 0;
 				rect.width = aFrameWidth;
@@ -214,7 +264,7 @@ package ru.antkarlov.anthill
 				var i:int = 0;
 				while (i < n)
 				{
-					rect.y = AntMath.floor(i / numFramesX);
+					rect.y = Math.floor(i / numFramesX);
 					rect.x = i - rect.y * numFramesX;
 					rect.x *= aFrameWidth;
 					rect.y *= aFrameHeight;
@@ -222,10 +272,10 @@ package ru.antkarlov.anthill
 					var bmpData:BitmapData = new BitmapData(aFrameWidth, aFrameHeight, true, 0x00000000);
 					bmpData.copyPixels(pixels, rect, DEST_POINT);
 					
-					(aFlip) ? frames[n-i-1] = bmpData : frames[i] = bmpData;
-					/*frames[frames.length] = bmpData;*/
-					offsetX[offsetX.length] = aOriginX;
-					offsetY[offsetY.length] = aOriginY;
+					//(aFlip) ? frames[n-i-1] = bmpData : frames[i] = bmpData;
+					frames.push(bmpData);
+					offsetX.push(aOriginX);
+					offsetY.push(aOriginY);
 					
 					i++;
 				}
@@ -235,9 +285,9 @@ package ru.antkarlov.anthill
 			}
 			else
 			{
-				frames[frames.length] = pixels;
-				offsetX[offsetX.length] = aOriginX;
-				offsetY[offsetY.length] = aOriginY;
+				frames.push(pixels);
+				offsetX.push(aOriginX);
+				offsetY.push(aOriginY);
 				width = pixels.width;
 				height = pixels.height;
 			}
@@ -265,28 +315,25 @@ package ru.antkarlov.anthill
 			var newBmp:BitmapData;
 			var i:int = 0;
 			var n:int = aFrames.length;
-			var frame:int;
 			while (i < n)
 			{
-				frame = aFrames[i];
-				
 				if (aCopy)
 				{
-					origBmp = frames[frame] as BitmapData;
+					origBmp = frames[i] as BitmapData;
 					rect.x = rect.y = 0;
 					rect.width = origBmp.width;
 					rect.height = origBmp.height;
 					newBmp = new BitmapData(rect.width, rect.height, true, 0);
 					newBmp.copyPixels(origBmp, rect, DEST_POINT);
-					newAnim.frames[newAnim.frames.length] = newBmp;
+					newAnim.frames.push(newBmp);
 				}
 				else
 				{
-					newAnim.frames[newAnim.frames.length] = frames[frame];
+					newAnim.frames.push(frames[i]);
 				}
 				
-				newAnim.offsetX = offsetX[frame];
-				newAnim.offsetY = offsetY[frame];
+				newAnim.offsetX.push(offsetX[i]);
+				newAnim.offsetY.push(offsetY[i]);
 				i++;
 			}
 			
@@ -349,7 +396,7 @@ package ru.antkarlov.anthill
 		{
 			if (!_animationCache.containsKey(aKey))
 			{
-				throw new Error("Missing animation \"" + aKey + "\".");
+				throw new Error("AntAnimation: Missing animation \'" + aKey + "\'.");
 			}
 
 			return _animationCache.get(aKey) as AntAnimation;
@@ -366,6 +413,25 @@ package ru.antkarlov.anthill
 			{
 				(_animationCache.get(aKey) as AntAnimation).destroy();
 				_animationCache.remove(aKey);
+			}
+		}
+		
+		/**
+		 * Удаляет все анимации из кэша анимаций.
+		 */
+		public function clearCache():void
+		{
+			var anim:AntAnimation;
+			for (var value:* in _animationCache)
+			{
+				if (_animationCache[value] != null)
+				{
+					anim = _animationCache.remove(value) as AntAnimation;
+					if (anim != null)
+					{
+						anim.destroy();
+					}
+				}
 			}
 		}
 

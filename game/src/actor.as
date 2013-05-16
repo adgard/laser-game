@@ -107,6 +107,15 @@ public class actor extends EventDispatcher
 	AntActor(_body.userData.graphic).y = _body.position.y;
 	AntActor(_body.userData.graphic).angle = ((_body.rotation) * 180 / Math.PI) % 360 ;
 	
+	if(_body.userData.act.imgCounter>=0){
+	 _body.userData.act.imgCounter --;
+	}
+	if (_body.userData.act.imgCounter == 0) {
+		if(_body.userData.act.isStatic==false)
+	     AntActor(_body.userData.graphic).visible = true;
+	}
+	
+	
 	//actorBox(_body.userData.act).velxy = _body.velocity;
 	if ((_body.userData.act).gameType == "button") {
 		
@@ -147,7 +156,15 @@ public class actor extends EventDispatcher
 	   
     AntActor(_body.userData.graphic).x = _body.position.x;
 	AntActor(_body.userData.graphic).y = _body.position.y;
-	AntActor(_body.userData.graphic).angle = ((_body.rotation) * 180/Math.PI) % 360 ;
+	AntActor(_body.userData.graphic).angle = ((_body.rotation) * 180 / Math.PI) % 360 ;
+	
+	if(_body.userData.act.imgCounter>=0){
+	 _body.userData.act.imgCounter --;
+	}
+	if (_body.userData.act.imgCounter == 0) {
+		if(_body.userData.act.isStatic==false)
+	     AntActor(_body.userData.graphic).visible = true;
+	}
 	//trace(_body.rotation);
 	  // actorCircle(_body.userData.act).velxy = _body.velocity;
 	return;

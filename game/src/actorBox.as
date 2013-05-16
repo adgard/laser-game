@@ -90,7 +90,7 @@ package
 		public var isStatic:Boolean = false;
 		
 		public var Arrow:AntActor ;
-		
+		public var imgCounter:int = 2;
 		
 		public var balloonPoints:Array = [new Vec2( -23,-23),new Vec2( -23,23),new Vec2( 23,-23),new Vec2( 23,23)];
 		
@@ -289,7 +289,12 @@ package
 		 case "balloon":
 				body.cbTypes.add(AntG.storage.get("balloonCBT"));	
 		 break;
-			 
+		
+		  case "arrow":
+				img.gotoAndPlay(2);
+				img.repeat = true;
+		 break;
+		 
 		 case "hero3":
 		 	body.cbTypes.add(AntG.storage.get("dynamicCBT"));
 			body.cbTypes.add(AntG.storage.get("hero3CBT"));		
@@ -375,10 +380,18 @@ package
 		
 		
 		body.position.setxy(xy.x, xy.y);
+		
+		
+		img.angle = (rotation * 180 / Math.PI) % 360 ;
 		if (isStatic) {
              img.visible = false;
 			}
-			img.angle = (rotation * 180 / Math.PI) % 360 ;
+		else 
+		     ;// img.visible = true;
+		
+			
+			
+		//	img.alpha = 1;
 		body.userData.graphic = img;
 		//body.
 		super(body,refType,refNumber);
@@ -386,6 +399,9 @@ package
 		
 		public function enableRefference():void 
 		{
+			if (!AntG.sounds.isPlaying("gButton"))
+			 AntG.sounds.play("gButton")
+			
 			for each (var refActor:* in actor(this).refArray ) {
 				switch (refActor._refType) {
 				 case "move":
@@ -487,7 +503,9 @@ package
 	  }
 		public function disableRefference():void 
 		{
-			
+			if (!AntG.sounds.isPlaying("gButton"))
+			 AntG.sounds.play("gButton")
+			 
 			for each (var refActor:* in actor(this).refArray ) {
 				switch (refActor._refType) {
 				 

@@ -69,8 +69,8 @@ public  dynamic class Main extends  MovieClip
 			AntG.frameRate = 30;// setFramerate(60);
 			AntG.setScreenSize(800, 480);
 			
-			var fps:fpsBox = new fpsBox(stage);
-            addChild(fps);
+			//var fps:fpsBox = new fpsBox(stage);
+           // addChild(fps);
 			
         }
 		 else{ 

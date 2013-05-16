@@ -278,8 +278,12 @@ package
 				
 			  if (cb.int2.userData.act._deleted == false) {	
 				  if (String(cb.int2.userData.act.gameType).substr(0, 4) == "hero") {
-			       AntG.storage.set("gameStatus", "failed");
-				   AntG.sounds.play("kill");
+			      
+					 if((!AntG.sounds.isPlaying("kill")&&AntG.storage.get("gameStatus")!="failed")){
+					 AntG.sounds.play("kill")
+					 
+					 AntG.storage.set("gameStatus", "failed");
+					 }
 				   
 				   if(cb.int2.userData.act.polygon.sensorEnabled == true)
 				    cb.int2.userData.graphic.addAnimationFromCache(String(cb.int2.userData.act.gameType).substr(0, 5) + "_a2_2");
@@ -299,8 +303,12 @@ package
 		    else {
 			  if (cb.int1.userData.act._deleted == false) {	
 				  if (String(cb.int1.userData.act.gameType).substr(0, 4) == "hero") {
-			       AntG.storage.set("gameStatus", "failed");
-				   AntG.sounds.play("kill");
+			       
+					 if ((!AntG.sounds.isPlaying("kill") && AntG.storage.get("gameStatus") != "failed")) {
+					  AntG.sounds.play("kill")
+					  AntG.storage.set("gameStatus", "failed");
+					 }
+				   
 				  if(cb.int1.userData.act.polygon.sensorEnabled == true)
 				    cb.int1.userData.graphic.addAnimationFromCache(String(cb.int1.userData.act.gameType).substr(0, 5) + "_a2_2");
 				   else 

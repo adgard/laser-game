@@ -74,6 +74,7 @@ package
 		public var magnetStatInited:Boolean = false;
 		public var Arrow:AntActor ;
 		public var finalStop:Boolean =  false;
+		public var imgCounter:int = 2;
 		
 		public function actorCircle( img:AntActor,_xy:Vec2, _rotation:Number, _bType:String,_shType:String, _settings:Array, _mType:String,_type:String,_isSensor:Boolean,_velxy:Vec2,_isMoveable:Boolean,_isMoveSensor:Boolean,_refNumber:int, _refType:String,_gameType:String, _rayType:String,_isStatic:Boolean) 
 		{
@@ -259,6 +260,11 @@ package
              img.clearAnimations();
 			}
 		img.angle = (rotation * 180 / Math.PI) % 360 ;	
+		
+		
+		if (isStatic) {
+             img.visible = false;
+			}
 		body.userData.graphic = img;
 		
 		if (shType == "balloon")
@@ -307,6 +313,9 @@ package
 		}
 		public function enableRefference():void 
 		{
+			
+			if (!AntG.sounds.isPlaying("gButton"))
+			 AntG.sounds.play("gButton")
 			for each (var refActor:* in actor(this).refArray ) {
 				switch (refActor._refType) {
 				 case "move":
@@ -373,6 +382,9 @@ package
 		public function disableRefference():void 
 		{
 			
+			if (!AntG.sounds.isPlaying("gButton"))
+			 AntG.sounds.play("gButton")
+			 
 			for each (var refActor:* in actor(this).refArray ) {
 				switch (refActor._refType) {
 				 case "move":

@@ -3,6 +3,8 @@ package
 	
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
+	import flash.events.MouseEvent;
+	import flash.net.URLRequest;
 	import flash.utils.*;
 	import nape.callbacks.*;
 	import nape.callbacks.InteractionCallback;
@@ -16,7 +18,7 @@ package
 	import ru.antkarlov.anthill.*;
 	import flash.filters.DropShadowFilter;
 	import flash.filters.GlowFilter;
-	
+	import flash.net.navigateToURL;
 	import nape.geom.*;
     import nape.phys.*;
     import nape.shape.*;
@@ -31,7 +33,7 @@ package
 		private var ice3:AntActor = new AntActor();
 		private var effectArray:Array = [];
 		private var effectForDelete:Array = [];
-		
+		private var soundButton:AntButton;
 		private var gameStatusCounter:int = 0;
 		private var currentGameStatus:String = "none";
 		
@@ -245,6 +247,7 @@ package
 				  currentAntActor.angle = m.rotation * Math.PI / 180;
 				  currentAntActor.addAnimationFromCache(getQualifiedClassName(MovieClip(m)));
 				  currentAntActor.tag = defGroup.numChildren;
+				  
 				  add(currentAntActor);
 				}	 
 				
@@ -259,6 +262,7 @@ package
 				  currentAntActor.angle = c.rotation * Math.PI / 180;
 				  currentAntActor.addAnimationFromCache(getQualifiedClassName(MovieClip(c)));
 				  currentAntActor.tag = defGroup.numChildren;
+				   currentAntActor.visible = false;
 				  add(currentAntActor);
 				 switch (c.name2) {
 					
@@ -281,11 +285,13 @@ package
 			for each(c in mcForPhysics) {
 				 // currentAnimation.destroy();
 				  currentAntActor = new AntActor();
+				  currentAntActor.visible = false;
 				  currentAntActor.x = c.x;
 				  currentAntActor.y = c.y;
 				  currentAntActor.angle = c.rotation * Math.PI / 180;
 				  currentAntActor.addAnimationFromCache(getQualifiedClassName(MovieClip(c)));
 				  currentAntActor.tag = defGroup.numChildren;
+				   
 				  add(currentAntActor);
 				 switch (c.name2) {
 					
@@ -458,6 +464,11 @@ package
 						  case "button_pmenu":
 							btn.eventClick.add(goToMenu);
 						  break;
+						  
+						  
+						  case "button_levels":
+							btn.eventClick.add(goToLevels);
+						  break;
 						  case "button_prestart":
 							btn.eventClick.add(goToRestart);
 						  break;
@@ -466,27 +477,49 @@ package
 							btn.eventClick.add(goToRestart);
 						  break;
 						  case "button_fsolution":
-							trace("solution");//btn.eventClick.add(goToRestart);
+							btn.eventClick.add(goToSolution);
+						  break;
+						   case "button_solution":
+							btn.eventClick.add(goToSolution);
 						  break;
 						  case "button_flevels":
+							btn.eventClick.add(goToLevels);
+						  break;
+						
+						  
+						  case "button_cMenu":
 							btn.eventClick.add(goToMenu);
 						  break;
 						  
-						  
-						  case "button_psolution":
+					  case "button_psolution":
+						  btn.eventClick.add(goToSolution);
 							trace("solution");//btn.eventClick.add(goToRestart);
 						  break;
 						  
-						  case "button_psound":
-							trace("sound");//btn.eventClick.add(goToRestart);
+					  case "button_psound":
+						 var s:MovieClip =  new soundZone();
+							 s.x = btn.x;
+							 s.y = btn.y;
+							 
+						     AntG.antSpace.addChild(s);
+							 remove(btn);
+							 
+							 if (AntG.sounds.mute == true){
+							    s.gotoAndStop(2);
+							   }
+							  else 
+							    s.gotoAndStop(1);
+							  
+							 
+							  s.addEventListener(MouseEvent.CLICK, goToSound);
 						  break;
 						  
 						  
 						  case "button_lrestart":
-							btn.eventClick.add(goToRestart);
+							btn.eventClick.add(goToRestartCompleted);
 						  break;
 						  case "button_llevels":
-							btn.eventClick.add(goToMenu);
+							btn.eventClick.add(goToLevels);
 						  break;
 						  case "button_lnext":
 							btn.eventClick.add(goToNext);
@@ -531,10 +564,25 @@ package
 	
 		} 
 		
+		private function goToRestartCompleted(aButton:AntButton):void 
+		{
+			AntG.storage.set("currentLevel",AntG.storage.get("currentLevel")-1);
+			aButton.eventClick.remove(goToRestart);
+			AntG.anthill.switchState(new playGameState());
+			AntG.sounds.play("button");
+		}
+		
+		private function goToLevels(aButton:AntButton):void 
+		{
+			aButton.eventClick.remove(goToLevels);
+			AntG.anthill.switchState(new levelsState());
+			AntG.sounds.play("button");
+		}
+		
 		private function goToNext(aButton:AntButton):void 
 		{
 			aButton.eventClick.remove(goToNext);
-			AntG.storage.set("currentLevel",AntG.storage.get("currentLevel")+1);
+			//AntG.storage.set("currentLevel",AntG.storage.get("currentLevel")+1);
 			AntG.anthill.switchState(new playGameState());
 			AntG.sounds.play("button");
 			lcompl.kill();
@@ -638,6 +686,9 @@ package
 						    bL.at(0).userData.graphic.addAnimationFromCache("mc_hero1");
 						   else
 						    bL.at(0).userData.graphic.addAnimationFromCache("hero1_a1");
+							
+			   //if(AntG.sounds.isPlaying("jump"))
+							AntG.sounds.play("jump");
 						  }
 						 }
 						  else{ 
@@ -661,13 +712,17 @@ package
 					        
 						    bL.at(0).userData.graphic.addAnimationFromCache("hero2_a1");
 							heroJump(bL.at(0));
+							
+			 
+							AntG.sounds.play("jump");
 						}
+						
 						else{ 
 						 trace("in flying");
 						// bL.at(0).userData.graphic.addAnimationFromCache("mc_hero2"); 
 						}
-						
-					 }	
+					  }
+					 	
 					 else{ 
 					   actorForDelete.push(bL.at(0).userData.act.ropeComp);
 					   bL.at(0).userData.act.ropeComp =  null;
@@ -691,10 +746,15 @@ package
 					     
 						  createExplosion(bL.at(0));
 						  
+			   //if(!AntG.sounds.isPlaying("bomb"))
+						  AntG.sounds.play("bomb");
 						  var boomBoom:AntActor = new AntActor();
 						  boomBoom.addAnimationFromCache("boom4");	 
 				          boomBoom.x = bL.at(0).position.x;
 				          boomBoom.y = bL.at(0).position.y;
+						  boomBoom.scaleX = 0.5;
+						  boomBoom.scaleY = 0.5;
+						  
 				          boomBoom.angle = bL.at(0).rotation;
 				          boomBoom.gotoAndPlay(2);
 				          add(boomBoom);
@@ -735,6 +795,9 @@ package
 				 break; 
 				 
 				  case "attraction":
+					  
+			   //if(!AntG.sounds.isPlaying("lazer"))
+					   AntG.sounds.play("lazer");
 					  if(bL.at(0).userData.act.rayEnabled == false){
 					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"attraction",400);
 				       rayCastArray.push(currentRay);
@@ -760,6 +823,9 @@ package
 				 break;
 				 
 				  case "killer":
+					  
+			   //if(!AntG.sounds.isPlaying("lazer"))
+					   AntG.sounds.play("lazer");
 					  if(bL.at(0).userData.act.rayEnabled == false){
 					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"killer",400);
 				       rayCastArray.push(currentRay);
@@ -780,6 +846,9 @@ package
 						}
 				 break;
 				  case "repulsion":
+					  
+			   //if(!AntG.sounds.isPlaying("lazer"))
+					  AntG.sounds.play("lazer");
 					  if(bL.at(0).userData.act.rayEnabled == false){
 					   currentRay =  new rays(bL.at(0), new Vec2(-10,0), 0,"repulsion",400);
 				       rayCastArray.push(currentRay);
@@ -908,9 +977,12 @@ package
 						  createExplosion(bL.at(i));
 						  
 						   var boomBoom:AntActor = new AntActor();
-						  boomBoom.addAnimationFromCache("boom");	 
-				          boomBoom.x = bL.at(i).position.x;
+						  boomBoom.addAnimationFromCache("boom4");	 
+				           boomBoom.scaleX = 0.5;
+						  boomBoom.scaleY = 0.5;
+						  boomBoom.x = bL.at(i).position.x;
 				          boomBoom.y = bL.at(i).position.y;
+						  
 				          boomBoom.angle = bL.at(i).rotation;
 				          boomBoom.gotoAndPlay(2);
 				          add(boomBoom);
@@ -963,6 +1035,9 @@ package
 				    b.userData.graphic.addAnimationFromCache("hero4_a0");
 			       
 				 }
+				 
+			   //if(!AntG.sounds.isPlaying("boxToCircle"))
+				 AntG.sounds.play("boxToCircle");
 			
 		}
 	private function updateRayCast():void
@@ -1018,18 +1093,21 @@ package
 		private function levelCompleted():void 
 		{
 			
+		  //if(!AntG.sounds.isPlaying("victory"))
+			AntG.sounds.play("victory");
 			lcompl.tag = 999;
 			
 			add(lcompl);
 			defGroup.sort("tag");
 			stopEngines();
 			defGroup;
+			//AntG.storage.set("currentLevel",AntG.storage.get("currentLevel")+1);
 			var a:* = AntCookie(AntG.storage.get("cookie")).read("levels");
-			(a as Array)[int(AntG.storage.get("currentLevel"))-1] = 2;
+			(a as Array)[int(AntG.storage.get("currentLevel"))] = 2;
+			AntG.storage.set("currentLevel",AntG.storage.get("currentLevel")+1);
 			if(int(AntG.storage.get("currentLevel"))!=28)
 			 (a as Array)[int(AntG.storage.get("currentLevel"))] = 1;
-			else 
-			 trace("game completed");
+			
 			AntCookie(AntG.storage.get("cookie")).write("levels", a);
 			
 		}
@@ -1037,14 +1115,27 @@ package
 		private function gameCompleted():void 
 		{
 			add(gcompl);
+			AntG.sounds.play("victory");
+			lcompl.tag = 999;
+			
+			
+			defGroup.sort("tag");
 			stopEngines();
+		
+			var a:* = AntCookie(AntG.storage.get("cookie")).read("levels");
+			(a as Array)[int(AntG.storage.get("currentLevel"))] = 2;
+			if(int(AntG.storage.get("currentLevel"))!=28)
+			 (a as Array)[int(AntG.storage.get("currentLevel"))] = 1;
+			
+			AntCookie(AntG.storage.get("cookie")).write("levels", a);
 		}
 		
 		private function levelFailed():void 
 		{
 			add(lFailed);
 			stopEngines();
-			AntG.sounds.play("failed");
+			//if(!AntG.sounds.isPlaying("failed"))
+			 AntG.sounds.play("failed");
 		}
 		private function stopEngines():void 
 		{
@@ -1429,27 +1520,46 @@ package
 						  }
 				  
 		}
-		
-		private function goToSouund(aButton:AntButton):void 
+		private function goToSound(e:MouseEvent):void 
 		{
-			trace("sound button");
+			
+			AntG.sounds.play("button");
+			if (AntG.sounds.mute == false){
+			 AntG.sounds.mute = true;
+			  AntG.sounds.pause();
+			  MovieClip(e.currentTarget).gotoAndStop(2);
+			   //aButton.selected = true;
+			}
+			
+			else {
+			  AntG.sounds.mute = false;
+			  AntG.sounds.resume();
+			  MovieClip(e.currentTarget).gotoAndStop(1);
+			  //aButton.selected = false;
+			}
 		}
+		
 		
 		private function goToRestart(aButton:AntButton):void 
 		{
 			aButton.eventClick.remove(goToRestart);
 			AntG.anthill.switchState(new playGameState());
+			AntG.sounds.play("button");
 		}
 		
 		private function goToMenu(aButton:AntButton):void 
 		{
 			aButton.eventClick.remove(goToMenu);
 			AntG.anthill.switchState(new menuMainState());
+			AntG.sounds.play("button");
 		}
 		
-		private function goToSolution():void 
+		private function goToSolution(aButton:AntButton):void 
 		{
-			trace("solution button");
+			AntG.sounds.play("button");
+			var url:String="http://www.youtube.com/watch?v=U5OrI5jbByA";
+            var urlRequest2:URLRequest=new URLRequest(url);
+            navigateToURL(urlRequest2);
 		}
  
 		
@@ -1471,7 +1581,9 @@ package
 			  mouseDownListener()
 			 if (AntG.mouse.isReleased())
 			  mouseUpListener()
-			}
+			 if (AntG.keys.R)
+			  goToRestartR();
+			 }
 			
 			if(run){
 			deletingActors();
@@ -1481,6 +1593,12 @@ package
 			}
 			 
 			super.update();
+		}
+		
+		private function goToRestartR():void 
+		{
+			AntG.anthill.switchState(new playGameState());
+			AntG.sounds.play("button");
 		}
 		
 		private function deletingActors():void 
@@ -1507,6 +1625,8 @@ package
 				   add(bug);
 				   effectArray.push(new effects(bug,aToDelete._body.position,aToDelete._body.rotation,"star"));
 			    starCounter--;
+			   //if(!AntG.sounds.isPlaying("beetle"))
+				AntG.sounds.play("beetle");
 			   }
 			   if (aToDelete._type == "ice") {
 				   
@@ -1526,12 +1646,20 @@ package
 				  // ice2.scaleY = 3;
 				   iceX.gotoAndPlay(2);
 				   add(iceX);
-				   effectArray.push(new effects(iceX,aToDelete._body.position,aToDelete._body.rotation,"ice"));
+				   effectArray.push(new effects(iceX, aToDelete._body.position, aToDelete._body.rotation, "ice"));
+				   
+				   
+			   if(!AntG.sounds.isPlaying("ice"))
+				   AntG.sounds.play("ice");
 				}
 					
 	           if ((starCounter <= 0)&&(AntG.storage.get("gameStatus")!="failed")) {
 				   
-			        AntG.storage.set("gameStatus", "levelCompleted");  
+			        if (AntG.storage.get("currentLevel") != 27)
+					 AntG.storage.set("gameStatus", "levelCompleted");  
+					else 
+					  AntG.storage.set("gameStatus", "gameCompleted");  
+					
 			   }
 		     }
 		    }
@@ -1580,6 +1708,19 @@ package
 			        if ((itemToDelete._body.userData.act.shType == "balloon")||(itemToDelete._body.userData.act.shType == "rope")){
  			        _space.compounds.remove(itemToDelete._body.compound);
 					 
+					if ((itemToDelete._body.userData.act.shType == "balloon")){
+					   
+			   if(!AntG.sounds.isPlaying("ballon"))
+						AntG.sounds.play("balloon");	 
+					}
+					
+					if ((itemToDelete._body.userData.act.shType == "rope")){
+					 
+			   if(!AntG.sounds.isPlaying("nitka"))
+						AntG.sounds.play("nitka");	 
+					}
+					
+					
 					if ((itemToDelete._body.userData.act.shType == "balloon")) {
 					  var bb:Body;
 					  for (var j:int =0; j < itemToDelete._body.compound.bodies.length; j++ ) {
@@ -1591,7 +1732,8 @@ package
 						
 					  var balloonX:AntActor =  new AntActor();
 					  balloonX.addAnimationFromCache("boomBallons");
-							 
+					   
+						
 				      balloonX.x = bb.position.x;
 				      balloonX.y = bb.position.y;
 				      balloonX.angle = bb.rotation;
@@ -1617,12 +1759,13 @@ package
 			 a.update();
 			
 			super.postUpdate();
-			
-			checkGameStatus(AntG.storage.get("gameStatus"));
+			if(run)
+			 checkGameStatus(AntG.storage.get("gameStatus"));
 			
 		}
 		override public function destroy():void
 		{
+			//soundButton.eventClick.remove(goToSound);
 			_camera.destroy();
 			_camera = null;
 			super.destroy();

@@ -2,6 +2,7 @@ package
 {
 	
 	import flash.display.MovieClip;
+	import flash.events.MouseEvent;
 	import ru.antkarlov.anthill.*;
 	import flash.filters.DropShadowFilter;
 	import flash.filters.GlowFilter;
@@ -15,7 +16,7 @@ package
 		private var mc:AntActor;
 		private var btn:AntButton;
 		public var storage:AntStorage = new AntStorage(true);
-		public var sharedObj:AntCookie = new AntCookie();
+		
 		public var mcIconArray:Array = [];
 		public var mcIconArrayName:Array = [];
 		
@@ -28,6 +29,7 @@ package
 			_camera = new AntCamera(0, 0, 640, 480);
 			_camera.fillBackground = true;
 			_camera.backgroundColor = 0xFFFFFFFF;
+			AntG.antSpace = this;
 			AntG.addCamera(_camera);
 			AntG.track(_camera, "menuCamera");
 			showLevelIcons(new level_menu());
@@ -65,7 +67,21 @@ package
 						
 						switch(pObject.name){
 						  case "button_lsound":
-							trace("sound");//btn.eventClick.add(goToPlayGame);
+							  var s:MovieClip =  new soundZone();
+							 s.x = btn.x;
+							 s.y = btn.y;
+							 
+						     AntG.antSpace.addChild(s);
+							 remove(btn);
+							 
+							 if (AntG.sounds.mute == true){
+							    s.gotoAndStop(2);
+							   }
+							  else 
+							    s.gotoAndStop(1);
+							  
+							 
+							  s.addEventListener(MouseEvent.CLICK, goToSound);
 						  break;
 						  case "button_lmenu":
 							btn.eventClick.add(goToMenu);
@@ -138,18 +154,58 @@ package
 			
 			aButton.eventClick.remove(goToPlayMenu);
 			AntG.anthill.switchState(new playGameState());	
+			AntG.sounds.play("button");
 		}
+		
+		private function goToSound(e:MouseEvent):void 
+		{
+			
+			AntG.sounds.play("button");
+			if (AntG.sounds.mute == false){
+			 AntG.sounds.mute = true;
+			  AntG.sounds.pause();
+			  MovieClip(e.currentTarget).gotoAndStop(2);
+			   //aButton.selected = true;
+			}
+			
+			else {
+			  AntG.sounds.mute = false;
+			  AntG.sounds.resume();
+			  MovieClip(e.currentTarget).gotoAndStop(1);
+			  //aButton.selected = false;
+			}
+		}
+		
+		
+/*	private function goToSound(aButton:AntButton):void 
+		{
+			AntG.sounds.play("button");
+			if (AntG.sounds.mute == true){
+			 AntG.sounds.mute = false;
+			  AntG.sounds.resume();
+			}
+			
+			else {
+			  AntG.sounds.mute = true;
+			  AntG.sounds.pause();
+			 
+			}
+		}
+		*/
+		
 		
 		private function goToMenu(aButton:AntButton):void 
 		{
 			aButton.eventClick.remove(goToMenu);
 			AntG.anthill.switchState(new menuMainState());
+			AntG.sounds.play("button");
 		}
 		
 		private function goToPlayGame(aButton:AntButton):void 
 		{
 			aButton.eventClick.remove(goToPlayGame);
 			AntG.anthill.switchState(new playGameState());
+			AntG.sounds.play("button");
 		}
 		
 		
